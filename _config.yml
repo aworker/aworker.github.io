@@ -5,9 +5,9 @@
 # Site
 title: Hexo
 subtitle:
-description:
-author: John Doe
-language:
+description: listen, quite is singing!
+author: aworker
+language: zh-Hans
 timezone:
 
 # URL
@@ -73,7 +73,7 @@ pagination_dir: page
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
 #theme: landscape
-theme: huno
+theme: next
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
