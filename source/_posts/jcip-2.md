@@ -17,7 +17,27 @@ tags: java并发
 对于第一点，我是感触颇深的，在刚工作不久有个同事开发一个功能，需要用到多线程技术，同事也非常注意多线程开发过程中的线程安全问题，没日没夜的忙了快两个月，后来又联合程序，测试，产品等测试将近一个月。可是到了功能上线的时候还是出现了死锁等线程安全问题。此后每周改功能上线的时候都会或多或少的爆出线程安全问题，直到功能正式上线1个月后才算稳定。在严密的测试也不能排查所有线上可能发生的多线程问题。
 第二点，可以参考修改老代码...改过别人代码的小伙伴们都懂。修复非线程安全类为线程安全的类和完善别人的代码本质上没有区别。都是抄剩饭。
 说了半天线程安全，那么什么是线程安全呢？
-{% img ./jcip_2/question.jpg %}
+<center>![黑人问号脸](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/question.jpg)</center>
+
+看下本书作者给的定义:
+>A class is thread‐safe if it behaves correctly when accessed from multiple threads, regardless of the scheduling or
+interleaving of the execution of those threads by the runtime environment, and with no additional synchronization or
+other coordination on the part of the calling code.
+<div align=right><b> Java Concurrency in Practice</b></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
