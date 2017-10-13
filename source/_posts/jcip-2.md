@@ -110,6 +110,91 @@ atm_wife.saveMoney(1);
 ```
 通过ATM的构造方法我们知道，当账号密码相同时候，会拿到同一张银行卡。如果你老婆和你同时存钱（假设开始卡里面没有一分钱），那么存钱结果可能是1，可能是500，当然也可能是你和银行都希望的501。为什么会这样呢？来看下面这张图片：
 <center> ![线程_内存模型图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_memory.png)</center>
+java 中的对象实例是存在 JMM中的堆内存的，类中的方法的局部变量存储规则如下：
+* 如果局部变量是基本类型（int，long，boolean等）其值是存在栈内存的，例如上图中的addMoney ,它是ATM的saveMoney方法的参数，其值存在栈内存。
+* 如果局部变量是非基本变量（各种类Integer，Long，或者本例中的ATM等），那么对这些类的实例的索引（atm_you atm_wife等）存在栈内存中，里面放着具体实例的堆内存地址。
+
+所以对于“你自己存钱”这个线程和“你老婆存钱”这个线程你们每个人都自己独立操作空间，这就相当于线程的栈内存，然后两个线程分别把500元和1元放进ATM机器，这个500元和1元就是局部变量，分别存储在各自的栈内存中。但是两个线程必须要操作同一张银行卡，怎么办呢？银行卡放在银行仓库中，这就相当于堆内存。于是就分别创建一个专线链接这张银行卡，这就相当于索引，然后把其中的money值分别读过来，操作完（money+500、money+1）再写回堆内存。这“读”，“操作”，“写”在计算机中虽然时间都特别短，但是总还是需要时间的，比如“你自己存钱”和“你老婆存钱”线程同时在12整进行。但是你的ATM机器反映灵敏一些。就会很可能出现如下图问题：
+![线程时序图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_time.png)
+两个线程虽然同时开始操作，但是因为各种原因，老婆的“读”慢了一些，你先把500这个结果存回银行卡，现在数字变成了500，3毫秒后，老婆线程的1元到账了，最后你银行卡中只有1元钱。为了便于理解，上图只假设“读”过程时间不同，其实“操作” “写”这个些过程的时间都不可能相同，线程的开始时间也不一定相同，那么结果就可以是1 500 501等不同情况了。因为不能总是达到我们的预期要求（银行卡存款额501） 所以BankCard这个类就是非线程安全的。
+那么怎么才能让BankCard这个类线程安全呢？ 答案是加锁，上述BankCard之所以不是线程安全的，根本原因是因为“你存钱线程”和“你老婆存钱线程”可以同时操作这唯一的一张银行卡，如果有一种机制能够在A线程想操作BankCard时候判断现在有没有其他线程正在操作BankCard，如果有，那么不许可A线程操作BankCard，如果没有那么A线程可以操作BankCard，java提供了锁机制来实现如上功能。来看BankCardSafe类：
+```
+public class BankCardSafe {
+    private int money;
+
+
+    public BankCardSafe(String userName,String userPassword){
+
+        /**
+         *  用 userName，userPassword查找数据库，初始化实例类BankCard
+         */
+    }
+
+    /**
+     * 查看银行卡余额
+     * @return
+     */
+    public synchronized int getMoney(){
+        return money;
+    }
+
+    /**
+     * 向银行卡中加钱
+     * @param addNum 加钱数
+     */
+    public synchronized  void addMoney(int addNum){
+        money = money + addNum;
+    }
+
+    /**
+     * 从银行卡中减钱
+     * @param subNum  减钱数
+     */
+    public synchronized void subMoney(int subNum){
+        if (money - subNum < 0) {
+            return;
+        }
+    }
+}
+```
+相比于BankCard类，BankCardSafe类只是在每个方法前面加个了<font color="gray">synchronized</font> 关键字，这就相当于给方法加了一把锁，我们称这种锁为内置锁（intrinsic lock），这种锁在保护和它最近的一对{ }中的所有代码，当程序执行到 { 时自动加锁，当程序执行到 } 时，自动释放锁。锁在同一时间只能被一个线程拥有。如果线程没有锁，那么它就不能执行锁所保护的方法，然后线程就一直等待，直到别的线程释放了这个锁，它拿到这个锁后才能继续执行。当我们把ATM类的成员变量改成BankCardSafe时：
+```
+public class ATM {
+
+    private BankCardSafe card;
+
+
+    public ATM(String userName,String userPassword) {
+        this.card = new BankCardSafe(userName, userPassword);
+    }
+
+    /**
+     * 通过ATM向指定银行卡存钱
+     * @param money
+     */
+    public void  saveMoney(int money){
+        card.addMoney(money);
+    }
+
+    /**
+     * 通过ATM从指定银行卡中取钱
+     * @param money
+     */
+    public void drawMoney(int money){
+        card.subMoney(money);
+    }
+}
+```
+这时程序的执行时序图就会变成下面的样子：
+![程序时序图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_time1.png)
+由于同一时间只能由一个线程抢到同一把锁，假设“老婆存钱线程”先拿到锁（老婆优先合情合理啊），那么只有它执行完“读” “操作” “写” 这些对BankCardSafe.money 变量的操作后，其释放完锁，"你存钱线程"才能拿到锁，然后才能继续执行你对BankCardSafe.money的“读” “操作” “写”等过程。这样就自然不会出错了。
+
+至此，《Java Concurrency in Pracetice》 第二章的大体知识就介绍完了。省下的还有充入锁，和一些关于执行效率的知识，感觉没有太大必要说，对于初学者来说。
+
+
+参考文献：
+> 1.《Java Concurrency in Pracetice》
+
 
 
 
