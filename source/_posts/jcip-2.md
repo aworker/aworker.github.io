@@ -189,7 +189,7 @@ public class ATM {
 ![程序时序图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_time1.png)
 由于同一时间只能由一个线程抢到同一把锁，假设“老婆存钱线程”先拿到锁（老婆优先合情合理啊），那么只有它执行完“读” “操作” “写” 这些对BankCardSafe.money 变量的操作后，其释放完锁，"你存钱线程"才能拿到锁，然后才能继续执行你对BankCardSafe.money的“读” “操作” “写”等过程。这样就自然不会出错了。
 
-至此，《Java Concurrency in Pracetice》 第二章的大体知识就介绍完了。省下的还有充入锁，和一些关于执行效率的知识，感觉没有太大必要说，对于初学者来说。
+至此，《Java Concurrency in Pracetice》 第二章的大体知识就介绍完了。剩下的还有重入锁，和一些关于执行效率的知识，感觉没有太大必要说，对于初学者来说。
 
 
 参考文献：
