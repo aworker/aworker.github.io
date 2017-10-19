@@ -32,18 +32,37 @@ register > 一级缓存 > 二级缓存 > ... > n级缓存 > 内存
  一个“a=a+1”操作计算机中被拆分成三个原子性操作，那么完全可以出现CPU执行完1.操作后，去执行别的操作了。这就是并发操作原子性问题的根本来源。
 
 2. ** 操作有序性 **：例如如下代码： 
-```
-public class A {
-    private int a;
-    private boolean b = false;
+ ```
+ public class A {
+    public int a;
+    public boolean b = false;
 
     public void methodA(){
         a = 3;
         b = true;
         a = a + 1;
     }
-} 
-```
-代码先经过java编译器编译成字节码，然后字节码然后被操作系统解释成机器指令，在这个解释过程中，操作系统可能发现，咦？在给变量b赋值为true后又操作了a变量，干脆我操作系统自己改改执行顺序，把对a变量的两个操作都执行完，然后再执行对b的操作,这就叫**指令重排序**。这样就会节省操作时间,如下图没有进行指令重排序时：
-![没有指令重排序](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/before_instruciton_reorder.png)
-图中CPU和缓存系统要进行9次通信，缓存系统和内存要通信7次，假设cpu和缓存系统通信一次用时1ms，缓存系统和内存通信一次用时10ms，那么总用时9*1 + 7*10 = 79ms。
+
+    public void methodB(){
+        a = 3;
+        b = (a == 4);
+        a = a + 1;
+    }
+ } 
+ ```
+ methodA方法代码先经过java编译器编译成字节码，然后字节码然后被操作系统解释成机器指令，在这个解释过程中，操作系统可能发现，咦？在给变量b赋值为true后又操作了a变量，干脆我操作系统自己改改执行顺序，把对a变量的两个操作都执行完，然后再执行对b的操作,这就叫**指令重排序**。这样就会节省操作时间,如下图没有进行指令重排序时：
+ ![没有指令重排序](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/before_instruciton_reorder.png)
+ 图中CPU和缓存系统要进行9次通信，缓存系统和内存要通信7次，假设cpu和缓存系统通信一次用时1ms，缓存系统和内存通信一次用时10ms，那么总用时 9乘1 + 7乘10 = 79ms。经过指令重排序后，总共用时  6乘1 + 6乘10 = 66ms 如下图所示：
+ ![有指令重排序](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/after_instruction_reorder.png)
+ 经过指令重排序的确可以提程序运行效率，所以现代计算机都会对指令进行重排序，但是这种重排序也不是无脑重排序，重排序的基础是前后语句不存在依赖关系时，才有可能发生指令重排序。所以A类的methodB方法不会发生指令重排序。指令重排序在单线程环境里面这不会有什么问题，但是多线程中就可能发生意外。比如线程1中执行如下代码：
+ ```
+ a.methodA();
+ ```
+ 另一个线程2执行如下代码：
+ ```
+ while(a.a != 4){ //a只要不等4，线程就让出CPU，等待调度器再次执行此线程
+ 	Thread.yield(); //让出CPU，线程进入就绪态
+ }
+ System.out.print(a.b);
+ ```
+ 如果线程1 发生了指令重排序， 那么这线程2的打印结果很有可能是false,这就和我们对代码的直观观察结果出处很大。如果线上产品出错的原因是指令重排序导致的，几乎不能可能排查出来。
