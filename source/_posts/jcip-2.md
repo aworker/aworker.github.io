@@ -97,7 +97,7 @@ public class ATM {
         card.subMoney(money);
     }
 } ```
-结合[ <font color=green> 《java并发编程实战》之java内存模型 </font> ](http://baidu.com)和线程安全的类的定义，我们知道BankCard是线程不安全的，当你和你妻子在不同的ATM机上通过输入账号密码来取钱时候（不用插卡的ATM机，没见过吧）。用代码模拟如下：
+结合[ <font color=green> 《java并发编程实战》之java内存模型 </font> ](http://aworker.cn/2017/10/18/java-memory-model/)和线程安全的类的定义，我们知道BankCard是线程不安全的，当你和你妻子在不同的ATM机上通过输入账号密码来取钱时候（不用插卡的ATM机，没见过吧）。用代码模拟如下：
 你自己存钱:
 ```
 ATM atm_you = ATM("10223","****");
