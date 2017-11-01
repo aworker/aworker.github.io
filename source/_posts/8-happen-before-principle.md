@@ -12,6 +12,7 @@ tags:
 * 线程中断的happen-before原则：对线程interrupt方法的调用happen-before被中断线程的检测到中断发送的代码。
 * 线程终结的happen-before原则：线程中的所有操作都happen-before线程的终止检测。
 * 对象创建的happen-before原则：一个对象的初始化完成先于他的finalize方法调用。
+  <!-- more -->
 
 首先在看本文前，最好先看下[《java并发编程实战》之java内存模型](http://aworker.cn/2017/10/18/java-memory-model/)这篇文章，对java内存模型有个了解。
 happen-before 在这里不能理解成在什么之前发生，它和时间没有任何关系。个人感觉解释成“*生效可见于*” 更准确。下面通过对这八个原则详细解释来加深对“*生效可见于*”的理解。

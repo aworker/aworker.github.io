@@ -9,6 +9,8 @@ tags: java并发
 >A program that omits needed synchronization might appear to work, passing its tests and performing well for years, but it is still broken and may fail at any moment.
 >It is far easier to design a class to be thread-safe than to retrofit it for thread safety later.
 <div align=right><b> Java Concurrency in Practice</b><div>
+    
+<!-- more -->
 
 两个观点分别强调线程安全在多线程环境的必要性：
 1. 你本应该应用并发的代码即使已经在生产环境中运行了很久，并且表现良好，但是它们也随时有可能崩溃。
