@@ -112,4 +112,67 @@ public void method1(int var){
 ```
 如果线程1调用了method1方法，其中的变量a和obj指向的对象永远不会被其他线程看到或者获得，如果又有新的线程2调用了method1方法，那么线程2对a变量的复制不会影响到线程1对a变量的复制。
 * “ThreadLocal的使用” ：ThreadLocal 类可以被理解成是一种特殊的Map，其key是线程实例自身，value是其想要独有的变量。具体使用方法大家可以去自行google。
+***
+**不变性**
+不可变的对象永远是线程安全的。如果一个对象自打创建以后其状态不可以再被改变，那么不管是哪个线程使用这个对象，此对象都是线程安全的。那么什么是不可变的对象呢？不可变对象要满足如下三个条件：
+1. 不可变对象的成员变量必须被声明成final类型的。
+2. 不可变对象的成员变量在初始化以后就不会再改变。
+3. 不可变对象在初始化的时候不会泄露this变量。
 
+下面看一个例子：
+```
+public class Immutable {
+	private final Set<String> set = new HashSet<String>();
+
+	public Immutable(){
+		set.add("started");
+		set.add("sleep");
+		set.add("suspend");
+	}
+
+	public Set<String> getStates(){
+		Set<String> newSet = new HashSet<String>();
+		newSet.addAll(set);
+		return newSet;
+	}
+}
+```
+我们来看下Immutable对象是一个不可变对象，首先它满足第一个条件，其成员变量都用final来修饰了；第二个条件，我们可以发现虽然set是一个Set类型的容器，但是其变量被声明成private类型的，而且Immutable类的getStates方法拿到的是set的深度拷贝，返回的那个Set类型的容器的变化不会对原来的set中的内容造成任何影响，set变量只是在Immutable的构造法中传入了三个值，在Immutable构造方法完成后，set中的内容不会被改变，所以其满足第二条；第三个条件，我们发现在构造方法中this变量没有被泄露，所以此条件也满足。所以Immutable对象是不可变对象，其也就是线程安全的。
+我们可以利用不可变对象是线程安全的这一特点来在多线程环境下实现不用锁的编程。如多线程环境下的一个简单的缓存系统设计：
+```
+class OneValue {
+    private final Integer number;
+    private final BigInteger[] result;
+
+    public OneValue(Integer number, BigInteger[] result) {
+        this.number = number;
+        this.result = result;
+    }
+
+    public BigInteger[] getResult(int number){
+        if ( this.number == null ||  number != this.number) {
+            return  null;
+        }
+
+        return Arrays.copyOf(result, result.length); //1
+    }
+}
+
+public class Cache {
+
+    private volatile OneValue oneValue = new OneValue(null, null); //2
+    public BigInteger[] getCache(Integer integer) {
+        BigInteger[] result = oneValue.getResult(integer);
+        if (result == null) {
+            /**
+             * result 值从硬盘中读取
+             */
+            oneValue = new OneValue(integer, result); //3
+        }
+
+        return  result;
+    }
+
+}
+```
+我们先看OneValue类，其实例化的对象都是不可变的对象，注意//1处的写法，没有直接返回result变量，而是对其进行深度拷贝，这样就保证getResult方法不会泄露result变量，从而避免其他线程通过getResult方法改变result变量的内容。在来看下Cache类，其实现的功能是只有一个缓存值的缓存系统，通过getCache方法传入一个整数，如果能命中那么就直接从内存返回结果，不然需要从硬盘中耗费较多的时间获取结果。由于OneValue是线程安全的，其在 //3处的代码操作的原子性，即integer和result的值要么同时改变，要么同时不变。而在//2出的oneValue变量被声明成volatile保证了可见性，如果有线程对oneValue变量进行修改，其它线程可以马上获得最新的oneValue值。整个系统没有用任何锁，但是却在volatile和不可变对象的支持下，完成了一个简单的多线程环境下线程安全的缓存系统。
