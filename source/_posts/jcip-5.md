@@ -51,5 +51,35 @@ public class Cache1 {
 ```
 大家都可以不加思索的设计出这这个版本，但是这个版本在并发效率上是非常低的，在多线程环境下，有时候Cache1类反而可能成为累赘。具体如下图所示：
 ![低并发的Cache1](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache1.png)
+当有线程1，线程2，线程3分别同时执行计算字符串"1"、"2"、"3"返回的值时，因为Cache1为了保证线程安全性，其用了synchrnozied关键字。这使得同一时间只能由一个线程调用Cache1.compute方法，如果把cache不能命中时Cache1.compute方法的执行时间设为一个单位时间。那么三个线程平均用时为2个单位时间（（1+2+3）/3 = 2),Cache1缓存的引用在某些情况下甚至起到了负作用，因为即使不用缓存直接使用ExpensiveCompution.compute方法，其线程的平均用时也只有一个单位时间。这肯定需要改善。
+***
+第二版
+分析第一版，之所以会在某些情况下让线程平均等待时间更长，是因为Cache1.compute方法把耗时很长的ExpensiveCompute.compution方法放在锁的里面，错误的锁的范围扩大了。启发下设计Cache2类如下：
+```
+public class Cache2 {
+    ExpensiveCompution computer;
+    private Map<String,Long> map = new HashMap<String,Long>();
+
+    public Cache2(ExpensiveCompution c) {
+        this.computer = c;
+    }
+
+    public Long compute(String string) {
+        Long aLong;
+        synchronized(this){ //1
+           aLong = map.get(string);
+        }
+        if (aLong == null) {
+            aLong = computer.compute(string);
+            synchronized (this) { //2
+                map.put(string, aLong);
+            }
+        }
+
+        return aLong;
+    }
+}
+```
+这样如果有线程1、线程2、线程3同时调用Cache2.compute方法分别计算"1"、"2"、"3"对应的返回值时会有如下情况：
 
 
