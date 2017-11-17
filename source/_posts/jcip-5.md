@@ -49,4 +49,7 @@ public class Cache1 {
     }
 }
 ```
-大家都可以不加思索的设计出这这个版本，但是这个版本在并发效率上是非常低的，在多线程环境下，有时候Cache1类反而可能成为累赘。具体如下图所示。
+大家都可以不加思索的设计出这这个版本，但是这个版本在并发效率上是非常低的，在多线程环境下，有时候Cache1类反而可能成为累赘。具体如下图所示：
+![低并发的Cache1](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache1.png)
+
+
