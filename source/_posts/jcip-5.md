@@ -66,14 +66,14 @@ public class Cache2 {
 
     public Long compute(String string) {
         Long aLong;
-        synchronized(this){ //1
-           aLong = map.get(string);
-        }
+        synchronized(this){                    //1
+           aLong = map.get(string);            //1
+        }                                      //1
         if (aLong == null) {
             aLong = computer.compute(string);
-            synchronized (this) { //2
-                map.put(string, aLong);
-            }
+            synchronized (this) {              //2
+                map.put(string, aLong);        //2
+            }                                  //2
         }
 
         return aLong;
@@ -81,5 +81,7 @@ public class Cache2 {
 }
 ```
 这样如果有线程1、线程2、线程3同时调用Cache2.compute方法分别计算"1"、"2"、"3"对应的返回值时会有如下情况：
-
+![Cache2较Cache1的优势](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache2.png)
+图中的"//1","//2"分别对应CaChe2类中对应的"//1","//2"部分。线程2、线程3也会阻塞，但其时间不会像用Cache1时那么长，如果假设"//1"处代码的执行时间为0.1个单位时间，那么三个线程的平均用时为1.1个单位时间((1+1.1+1.2)/3=1.1)。实时上代码"//1"处的用时远远不能达到0.1个单位时间这么长，三个线程的平均用时随着ExpensiveCompution.compute的执行时间和"//1"的执行时间的比值的增大而减少，即平均用时将近1个单位时间,这就是非常大的进步。但是其代码还有如下图的缺点存在：
+![Cache2任然存在的缺点](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache2.png)
 
