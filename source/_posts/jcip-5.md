@@ -83,5 +83,85 @@ public class Cache2 {
 这样如果有线程1、线程2、线程3同时调用Cache2.compute方法分别计算"1"、"2"、"3"对应的返回值时会有如下情况：
 ![Cache2较Cache1的优势](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache2.png)
 图中的"//1","//2"分别对应CaChe2类中对应的"//1","//2"部分。线程2、线程3也会阻塞，但其时间不会像用Cache1时那么长，如果假设"//1"处代码的执行时间为0.1个单位时间，那么三个线程的平均用时为1.1个单位时间((1+1.1+1.2)/3=1.1)。实时上代码"//1"处的用时远远不能达到0.1个单位时间这么长，三个线程的平均用时随着ExpensiveCompution.compute的执行时间和"//1"的执行时间的比值的增大而减少，即平均用时将近1个单位时间,这就是非常大的进步。但是其代码还有如下图的缺点存在：
-![Cache2任然存在的缺点](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache2.png)
+![Cache2任然存在的缺点](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-5/Cache2_disadvantage.png)
+此图中的两个线程都都请求计算字符串"1"的值，因为线程2在线程1执行"//2"代码前请求了Cache2.compute方法，而此时线程1虽然正在计算"1"的值，但是在线程1执行"//2"代码前，线程2是不知道已经有线程去执行"1"的计算，就违背了缓存系统的设计初衷：避免同一个变量的重复计算。代码仍然需要改进。
+***
+第三版
+观察Cache2类的代码我们知道其有一个非常长的窗口期(//1 + compute，约0.9个单位时间)，如果线程2在线程1执行的窗口期内请求处理同一个字符串（如上面的“1”）,那么会导致重复计算。窗口期长的原因主要在于compute的计算在窗口期内，如果我们想办法能把compute的计算时间移除窗口，那么我们就能缩短窗口期。这就需要用到一个非常有用的阻塞类:FutureTask。具体代码如下：
+```
+public class Cache3 {
+    ExpensiveCompution computer;
+    private Map<String,FutureTask<Long>> map = new HashMap<String,FutureTask<Long>>();
 
+    public Cache3(ExpensiveCompution c) {
+        this.computer = c;
+    }
+
+    public Long compute(String string) throws InterruptedException,ExecutionException{
+        FutureTask<Long> ft;
+        synchronized(this){                  //1
+            ft = map.get(string);            //1
+        }                                    //1
+        if (ft == null) {
+
+            ft = new FutureTask<Long>(new Callable<Long>() {  //3
+                @Override                                     //3
+                public Long call() throws Exception {         //3
+                    return  computer.compute(string);         //3
+                }                                             //3
+            });                                               //3
+            synchronized (this) {            //2
+                map.put(string, ft);         //2
+            }                                //2
+            ft.run();                        //ExpensvieCompution.compute方法在此开始执行
+            
+        }
+
+        return ft.get();
+
+
+
+    }
+}
+```
+在Cache3中，重复计算的窗口期仅仅为（//1+//3)这段时间,而最最消耗时间的ExpensiveCompution.compute被移到了ft.run方法后执行，同时得益于FutureTask.get方法的语法特性，当线程2在线程1的非窗口期计算字符串“1”的返回值时候，其将得到和线程1相同的FutureTask实例。这就很大程度上的避免了对相同请求参数的重复计算。当然如果我们在//2处增加二次判断，就可以完全清除窗口期，这个缓存类的设计也就将近完美(除了定期要清理缓存中的数据外)。具体类Cache4如下图所示：
+```
+public class Cache4 {
+    ExpensiveCompution computer;
+    private Map<String,FutureTask<Long>> map = new HashMap<String,FutureTask<Long>>();
+
+    public Cache4(ExpensiveCompution c) {
+        this.computer = c;
+    }
+
+    public Long compute(String string) throws InterruptedException,ExecutionException{
+        FutureTask<Long> ft;
+        synchronized(this){                  //1
+            ft = map.get(string);            //1
+        }                                    //1
+        if (ft == null) {
+
+            ft = new FutureTask<Long>(new Callable<Long>() {  //3
+                @Override                                     //3
+                public Long call() throws Exception {         //3
+                    return  computer.compute(string);         //3
+                }                                             //3
+            });                                               //3
+            synchronized (this) {                 //2
+                if (map.get(string) == null) {    //2
+                    map.put(string, ft);          //2
+                    ft.run();                     //2 ExpensvieCompution.compute方法在此开始执行
+                } else {                          //2
+                    ft = map.get(string);         //2
+                }                                 //2
+            }                                     //2
+        }
+
+        return ft.get();
+
+
+
+    }
+}
+```
+至此应用java阻塞类，我们设计了一个完美的线程安全的缓存系统。当然也可以把各种Cache的成员变量map换成ConcurrentHashMap类型，那样效率会更高一些。
