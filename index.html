@@ -14,7 +14,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-CN">
+<html class="theme-next gemini use-motion" lang="zh-CN">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -84,7 +84,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Gemini',
     version: '6.3.0',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: false,
@@ -238,9 +238,6 @@
   
 
   
-    
-
-  
 
   
 </nav>
@@ -261,9 +258,158 @@
       <div class="main-inner">
         <div class="content-wrap">
           
+            
+
+          
           <div id="content" class="content">
             
   <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/15/jcip-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="aworker">
+      <meta itemprop="description" content="听，寂寞在唱歌">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/07/15/jcip-6/" itemprop="url">
+                  《java并发编程实战》第六章：任务的执行
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-07-15 11:29:50 / 修改时间：21:45:22" itemprop="dateCreated datePublished" datetime="2018-07-15T11:29:50+08:00">2018-07-15</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在组建java程序时候关于任务执行方面第一个要考虑的就是任务边界的划分，即把执行的程序分成合理的任务，理想的情况是这些任务的状态，结果不会影响到其它任务。</p>
+<p>以java最擅长的服务器端开发为例子，服务器端要做到两点：高并发（good throughput）、低延迟（good responsiveness）。高并发是服务提供者的需要，我们想让我们的程序承载更多的用户来分担服务器开销；低延迟是用户的需求，用户想尽快的看到服务器对请求的响应结果。同样服务器的任务划分也是比较清晰和明确的：我们可以把用户的一个请求，作为一个任务。在高并发、低延迟的要求下，我们来设计下服务器的并发框架。<br>首先能想到的是单线程模式，程序如下:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class SingleThreadWebServer&#123;</span><br><span class="line">	public static void main(String[] args) throws Exception&#123;</span><br><span class="line">		ServerSocket server = new ServerSocket(8900);</span><br><span class="line">		while(true)&#123;</span><br><span class="line">			Socket socket = server.accept(); </span><br><span class="line">			handlerRequest(socket);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个程序中，每个客户端请求和其处理都在一个程序中执行，在handlerRequest方法比较耗时的情况下，用户将感觉到卡顿，没能做到低延迟；同时因为同一时间只能有一个客户端请求被处理，服务器也没能做到高并发。在真实的生产环境中，除了GUI程序，基本上不会用到这种模型框架。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/07/15/jcip-6/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
     
       
 
@@ -1135,7 +1281,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-11 09:33:42" itemprop="dateModified" datetime="2018-07-11T09:33:42+08:00">2018-07-11</time>
+                <time title="修改时间：2018-07-15 16:34:26" itemprop="dateModified" datetime="2018-07-15T16:34:26+08:00">2018-07-15</time>
               
             
           </span>
@@ -1173,7 +1319,6 @@
 <blockquote>
 <p>A program that omits needed synchronization might appear to work, passing its tests and performing well for years, but it is still broken and may fail at any moment.<br>It is far easier to design a class to be thread-safe than to retrofit it for thread safety later.</p>
 </blockquote>
-<div align="right"><b> Java Concurrency in Practice</b><div><br><br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2017/10/10/jcip-2/#more" rel="contents">
@@ -1412,7 +1557,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1586,6 +1731,13 @@
   
   
 
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
   
 
   
@@ -1627,6 +1779,21 @@
   
 
   
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
 
   
 

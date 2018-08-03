@@ -14,7 +14,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-CN">
+<html class="theme-next gemini use-motion" lang="zh-CN">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -84,7 +84,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Gemini',
     version: '6.3.0',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: false,
@@ -120,7 +120,7 @@
 <meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_memory.png">
 <meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_time.png">
 <meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/thread_time1.png">
-<meta property="og:updated_time" content="2018-07-11T01:33:42.452Z">
+<meta property="og:updated_time" content="2018-07-15T08:34:26.163Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="《java并发编程实战》第二章：线程安全">
 <meta name="twitter:description" content="第一章主要通过多线程如何重要，多线程将来要应用的越来越多，像是全书的一个引子，就是告诉读者，你选择本书没有错，这本书讲述的就是java中最重要的多线程部分，是程序开发技术中的屠龙刀。诚然本书（英文版本）是在2006年既java诞生10周年时候出版的。距离我2017年看本书已经过十年多的时间，虽然此书仍然是java并发界，乃至程序并发界一本经典书籍，此书中的绝大多数观点依然没有过时，但是计算机技术日">
@@ -244,9 +244,6 @@
   
 
   
-    
-
-  
 
   
 </nav>
@@ -266,6 +263,9 @@
     <main id="main" class="main">
       <div class="main-inner">
         <div class="content-wrap">
+          
+            
+
           
           <div id="content" class="content">
             
@@ -345,7 +345,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-07-11 09:33:42" itemprop="dateModified" datetime="2018-07-11T09:33:42+08:00">2018-07-11</time>
+                <time title="修改时间：2018-07-15 16:34:26" itemprop="dateModified" datetime="2018-07-15T16:34:26+08:00">2018-07-15</time>
               
             
           </span>
@@ -382,10 +382,24 @@
 <blockquote>
 <p>A program that omits needed synchronization might appear to work, passing its tests and performing well for years, but it is still broken and may fail at any moment.<br>It is far easier to design a class to be thread-safe than to retrofit it for thread safety later.</p>
 </blockquote>
-<div align="right"><b> Java Concurrency in Practice</b><div><br><br><a id="more"></a><br><br>两个观点分别强调线程安全在多线程环境的必要性：<br>1. 你本应该应用并发的代码即使已经在生产环境中运行了很久，并且表现良好，但是它们也随时有可能崩溃。<br>2. 去修复一个类或者一段代码来保证它们是线程安全的远比当初就把它们设计成线程安全的要复杂的多。<br><br>对于第一点，我是感触颇深的，在刚工作不久有个同事开发一个功能，需要用到多线程技术，同事也非常注意多线程开发过程中的线程安全问题，没日没夜的忙了快两个月，后来又联合程序，测试，产品等测试将近一个月。可是到了功能上线的时候还是出现了死锁等线程安全问题。此后每周改功能上线的时候都会或多或少的爆出线程安全问题，直到功能正式上线1个月后才算稳定。在严密的测试也不能排查所有线上可能发生的多线程问题。<br>第二点，可以参考修改老代码…改过别人代码的小伙伴们都懂。修复非线程安全类为线程安全的类和完善别人的代码本质上没有区别。都是抄剩饭。<br>说了半天线程安全，那么什么是线程安全呢？<br><center><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/question.jpg" alt="黑人问号脸"></center><br><br>看下本书作者给的定义:<br>&gt;A class is thread‐safe if it behaves correctly when accessed from multiple threads, regardless of the scheduling or<br>interleaving of the execution of those threads by the runtime environment, and with no additional synchronization or<br>other coordination on the part of the calling code.<br><div align="right"><b> Java Concurrency in Practice</b></div>
+<a id="more"></a>
+<p>两个观点分别强调线程安全在多线程环境的必要性：</p>
+<ol>
+<li>你本应该应用并发的代码即使已经在生产环境中运行了很久，并且表现良好，但是它们也随时有可能崩溃。</li>
+<li>去修复一个类或者一段代码来保证它们是线程安全的远比当初就把它们设计成线程安全的要复杂的多。</li>
+</ol>
+<p>对于第一点，我是感触颇深的，在刚工作不久有个同事开发一个功能，需要用到多线程技术，同事也非常注意多线程开发过程中的线程安全问题，没日没夜的忙了快两个月，后来又联合程序，测试，产品等测试将近一个月。可是到了功能上线的时候还是出现了死锁等线程安全问题。此后每周改功能上线的时候都会或多或少的爆出线程安全问题，直到功能正式上线1个月后才算稳定。在严密的测试也不能排查所有线上可能发生的多线程问题。<br>第二点，可以参考修改老代码…改过别人代码的小伙伴们都懂。修复非线程安全类为线程安全的类和完善别人的代码本质上没有区别。都是抄剩饭。<br>说了半天线程安全，那么什么是线程安全呢？</p>
+<center><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/jcip-2/question.jpg" alt="黑人问号脸"></center>
+
+<p>看下本书作者给的定义:</p>
+<blockquote>
+<p>A class is thread‐safe if it behaves correctly when accessed from multiple threads, regardless of the scheduling or<br>interleaving of the execution of those threads by the runtime environment, and with no additional synchronization or<br>other coordination on the part of the calling code.</p>
+</blockquote>
+<div align="right"><b> Java Concurrency in Practice</b></div>
 
 <p>一个类是线程安全的要满足两个条件：<br><strong> 1. 不管java的运行时（runtime environment）怎么安排线程访问此类的顺序都能得到最终你认为结果。</strong><br>比如你和你和你老婆大人公用一张银行卡（当然是你的工资卡了）。你和你老婆大人都可以向这个银行卡里面存钱同时也可以取钱。如果你月薪500元，在你发工资后，银行就不能让你和你老婆大人分别取出500元，不管你先取钱然后你老婆大人再取钱，还是你老婆大人先取钱然后你再取钱，亦或是你们两个协调好了同时取钱。如果你和老婆大人手里一共有500元，那么卡里余额绝对是0元，如果不是0元，而是1000元，那么劝你赶快去银行“自首”，因为任何意外所得都归国有。这里银行卡就相当于一个线程安全的类，而你和你老婆大人就是两个不同的线程。<br><strong> 2. 线程安全的类的“安全性”是它自身属性，使用它的类不需要提供额外的安全机制。</strong><br>这点就很好解释了，银行保证你卡里面的500元钱不管你怎么折腾都不会多，不管你是去ATM取钱，拿支付宝转账，用微信买瓶饮料。钱数该减少10元时候它绝对不会增加1元，该增加1元的时候它也绝对不会减少1分。</p>
-<p>有童鞋可能会说，这两个条件不是天经地义的吗？本来就应该这样啊，但是啊，你认为的天经地义是习惯成自然的结果，就和你丢了钱去找警察，买个东西要交钱都是后天条件反射。对于咿呀学语的小孩纸来说，这些都不那么自然，都要问下为什么。以下面的银行卡类和ATM类，对刚才的两条进行详细说明。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public class BankCard &#123;</span><br><span class="line">    private int money;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public BankCard(String userName,String userPassword)&#123;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         *  用 userName，userPassword查找数据库，初始化实例类BankCard。</span><br><span class="line">         */</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 查看银行卡余额</span><br><span class="line">     * @return</span><br><span class="line">     */</span><br><span class="line">    public int getMoney()&#123;</span><br><span class="line">        return money;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 向银行卡中加钱</span><br><span class="line">     * @param addNum 加钱数</span><br><span class="line">     */</span><br><span class="line">    public void addMoney(int addNum)&#123;</span><br><span class="line">        money = money + addNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 从银行卡中减钱</span><br><span class="line">     * @param subNum  减钱数</span><br><span class="line">     */</span><br><span class="line">    public void subMoney(int subNum)&#123;</span><br><span class="line">        if (money - subNum &lt; 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有童鞋可能会说，这两个条件不是天经地义的吗？本来就应该这样啊，但是啊，你认为的天经地义是习惯成自然的结果，就和你丢了钱去找警察，买个东西要交钱都是后天条件反射。对于咿呀学语的小孩纸来说，这些都不那么自然，都要问下为什么。以下面的银行卡类和ATM类，对刚才的两条进行详细说明。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public class BankCard &#123;</span><br><span class="line">    private int money;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public BankCard(String userName,String userPassword)&#123;</span><br><span class="line"></span><br><span class="line">        /**</span><br><span class="line">         *  用 userName，userPassword查找数据库，初始化实例类BankCard。</span><br><span class="line">         */</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 查看银行卡余额</span><br><span class="line">     * @return</span><br><span class="line">     */</span><br><span class="line">    public int getMoney()&#123;</span><br><span class="line">        return money;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 向银行卡中加钱</span><br><span class="line">     * @param addNum 加钱数</span><br><span class="line">     */</span><br><span class="line">    public void addMoney(int addNum)&#123;</span><br><span class="line">        money = money + addNum;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 从银行卡中减钱</span><br><span class="line">     * @param subNum  减钱数</span><br><span class="line">     */</span><br><span class="line">    public void subMoney(int subNum)&#123;</span><br><span class="line">        if (money - subNum &lt; 0) &#123;</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class ATM &#123;</span><br><span class="line"></span><br><span class="line">    private BankCard card;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public ATM(String userName,String userPassword) &#123;</span><br><span class="line">        this.card = new BankCard(userName, userPassword);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 通过ATM向指定银行卡存钱</span><br><span class="line">     * @param money</span><br><span class="line">     */</span><br><span class="line">    public void  saveMoney(int money)&#123;</span><br><span class="line">        card.addMoney(money);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 通过ATM从指定银行卡中取钱</span><br><span class="line">     * @param money</span><br><span class="line">     */</span><br><span class="line">    public void drawMoney(int money)&#123;</span><br><span class="line">        card.subMoney(money);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>结合<a href="http://aworker.cn/2017/10/18/java-memory-model/" target="_blank" rel="noopener"> <font color="green"> 《java并发编程实战》之java内存模型 </font> </a>和线程安全的类的定义，我们知道BankCard是线程不安全的，当你和你妻子在不同的ATM机上通过输入账号密码来取钱时候（不用插卡的ATM机，没见过吧）。用代码模拟如下：<br>你自己存钱:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ATM atm_you = ATM(&quot;10223&quot;,&quot;****&quot;);</span><br><span class="line">atm_you.saveMoney(500);</span><br></pre></td></tr></table></figure></p>
 <p>你老婆存钱:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ATM atm_wife = ATM(&quot;10223&quot;,&quot;*****&quot;);</span><br><span class="line">atm_wife.saveMoney(1);</span><br></pre></td></tr></table></figure></p>
@@ -403,7 +417,7 @@
 <blockquote>
 <p>1.《Java Concurrency in Pracetice》</p>
 </blockquote>
-</div></div>
+
       
     </div>
 
@@ -513,7 +527,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -687,6 +701,13 @@
   
   
 
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
@@ -732,6 +753,21 @@
   
 
   
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
 
   
 
