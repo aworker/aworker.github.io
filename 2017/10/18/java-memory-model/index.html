@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="“如欲征服java并发，需先征服java内存模型，如欲征服java内存模型，需先征服计算机内存模型” -aworker.  咳！咳！，大家都记好笔记了吧。虽然我不是什么大佬，但是这句话说的还是没有毛病的。不了解java的内存模型，就不会从跟不上理解java并发的一些行为和机制，而java内存模型毕竟是jvm模拟出来的一部分，其底子还是建立在现代计算机的物理内存模型上来的，所以我们就按照现代计算机">
+<meta name="keywords" content="java并发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《java并发编程实战》之java内存模型">
+<meta property="og:url" content="http://yoursite.com/2017/10/18/java-memory-model/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="“如欲征服java并发，需先征服java内存模型，如欲征服java内存模型，需先征服计算机内存模型” -aworker.  咳！咳！，大家都记好笔记了吧。虽然我不是什么大佬，但是这句话说的还是没有毛病的。不了解java的内存模型，就不会从跟不上理解java并发的一些行为和机制，而java内存模型毕竟是jvm模拟出来的一部分，其底子还是建立在现代计算机的物理内存模型上来的，所以我们就按照现代计算机">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/leader_speak.jpg">
+<meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/memory_model_physical.png">
+<meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/before_instruciton_reorder.png">
+<meta property="og:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/after_instruction_reorder.png">
+<meta property="og:updated_time" content="2018-07-11T01:33:42.435Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《java并发编程实战》之java内存模型">
+<meta name="twitter:description" content="“如欲征服java并发，需先征服java内存模型，如欲征服java内存模型，需先征服计算机内存模型” -aworker.  咳！咳！，大家都记好笔记了吧。虽然我不是什么大佬，但是这句话说的还是没有毛病的。不了解java的内存模型，就不会从跟不上理解java并发的一些行为和机制，而java内存模型毕竟是jvm模拟出来的一部分，其底子还是建立在现代计算机的物理内存模型上来的，所以我们就按照现代计算机">
+<meta name="twitter:image" content="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/leader_speak.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/18/java-memory-model/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>《java并发编程实战》之java内存模型 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/18/java-memory-model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="aworker">
+      <meta itemprop="description" content="听，寂寞在唱歌">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《java并发编程实战》之java内存模型
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-10-18 15:28:49" itemprop="dateCreated datePublished" datetime="2017-10-18T15:28:49+08:00">2017-10-18</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-07-11 09:33:42" itemprop="dateModified" datetime="2018-07-11T09:33:42+08:00">2018-07-11</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>“如欲征服java并发，需先征服java内存模型，如欲征服java内存模型，需先征服计算机内存模型” -aworker.</p>
+</blockquote>
+<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/leader_speak.jpg" alt="大佬讲话"><br>咳！咳！，大家都记好笔记了吧。虽然我不是什么大佬，但是这句话说的还是没有毛病的。不了解java的内存模型，就不会从跟不上理解java并发的一些行为和机制，而java内存模型毕竟是jvm模拟出来的一部分，其底子还是建立在现代计算机的物理内存模型上来的，所以我们就按照现代计算机的物理内存模型、java内存模型的顺序来仔细介绍，为彻底了解java并发机制打下底子。<br><a id="more"></a><br>现代计算机的物理内存模型：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/memory_model_physical.png" alt="现代计算机的物理内存模型"><br>现在计算机最少的都是应该是两核心了，当然我们也经常在买个人电脑的时候听过四核四线程、四核八线程等，可以说现在个人电脑标配都是四核心了，为了方便上图只是列举了2个核心。现代计算机的内存在逻辑上还是一块。有人可能问不对啊，我电脑就插了两块内存，但是操作系统会把两块内存的地址统一抽象，比如每一块的内存是2048MB地址是000000000000-011111111111MB，两块就是0000000000000-0111111111111MB，操作系统会统一编址。所以整体上看还是一块内存。因为CPU的操作速度太快，如果让CPU直接操作内存，那么久是对CPU资源的一种巨大浪费，为了解决这个问题现在计算机都给CPU加上缓存，比如一级缓存，二级缓存，甚至三级缓存。缓存速度比内存快，但是是还是赶不上CPU的数据级别，所以在缓存和CPU之间又有了register,register的存储速度比缓存就快了好多了。<br>存储速度上有如下关系：<br>register &gt; 一级缓存 &gt; 二级缓存 &gt; … &gt; n级缓存 &gt; 内存<br>容量上一般有如下关系：<br>内存 &gt; n级缓存 &gt; … &gt; 二级缓存 &gt; 一级缓存 &gt; register<br>之所以可以用缓存和register来缓解CPU和内存之间巨大的速度差别是基于如下原理：</p>
+<p><strong> CPU访问过的内存地址，很有可能在短时间内会被再次访问。 </strong><br>所以，比如CPU访问了地址为0x001fffff的内存地址，如果没有缓存和register，那么CPU再下次访问这个内存地址的时候就还要去内存读，但是如果有缓存，缓存会把CPU访问过的数据先存储起来，等CPU待会再找地址为0x001fffff的内存地址时候，发现其在缓存中就存在了，那么好了，这就不用在访问内存了。速度自然就提升了。这就涉及到计算机组成原理的知识了，如果想了解可以google一下，这里就不在做更深的介绍了到这里就够用了。<br>了解现代计算机物理内存模型工作原理后，那么再理解多线程开发中最关系的三个概念就有的放矢了。先介绍下三个概念：</p>
+<ol>
+<li><p><strong> 操作原子性 </strong>：一个操作要么全做，要么全不做，那么这个操作就符合原子性。比如你给你老婆银行卡转500块钱，就包括两个操作，自己账户先减500，你老婆账户加500。但是这个转账操作应该满足原子性。如果银行只执行了你自己账户的扣钱操作，没有执行给你老婆账户的加钱操作。丢了500块钱是小事，被老婆大人罚跪搓衣板可就不得了了。所以你自己账户减钱，老婆账户加钱，这两个操作要么都做了，要么都别做。例如如下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = a + 1;</span><br></pre></td></tr></table></figure>
+<p>结合我们上述的现代计算机的内存模型，计算机执行a=a+1时候会分成三个原子性操作：</p>
+<ol>
+<li>把a的值（比如4）从内存中取出放到CPU的缓存系统中</li>
+<li>从缓存系统中取出a的值加1（4+1）得到新结果</li>
+<li>把新结果存回到内存中</li>
+</ol>
+<p>一个“a=a+1”操作计算机中被拆分成三个原子性操作，那么完全可以出现CPU执行完1.操作后，去执行别的操作了。这就是并发操作原子性问题的根本来源。</p>
+</li>
+<li><p><strong> 操作有序性 </strong>：例如如下代码： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class A &#123;</span><br><span class="line">   public int a;</span><br><span class="line">   public boolean b = false;</span><br><span class="line"></span><br><span class="line">   public void methodA()&#123;</span><br><span class="line">       a = 3;</span><br><span class="line">       b = true;</span><br><span class="line">       a = a + 1;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void methodB()&#123;</span><br><span class="line">       a = 3;</span><br><span class="line">       b = (a == 4);</span><br><span class="line">       a = a + 1;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>methodA方法代码先经过java编译器编译成字节码，然后字节码然后被操作系统解释成机器指令，在这个解释过程中，操作系统可能发现，咦？在给变量b赋值为true后又操作了a变量，干脆我操作系统自己改改执行顺序，把对a变量的两个操作都执行完，然后再执行对b的操作,这就叫<strong>指令重排序</strong>。这样就会节省操作时间,如下图没有进行指令重排序时：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/before_instruciton_reorder.png" alt="没有指令重排序"><br>图中CPU和缓存系统要进行9次通信，缓存系统和内存要通信7次，假设cpu和缓存系统通信一次用时1ms，缓存系统和内存通信一次用时10ms，那么总用时 9乘1 + 7乘10 = 79ms。经过指令重排序后，总共用时  6乘1 + 6乘10 = 66ms 如下图所示：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java-memory-model/after_instruction_reorder.png" alt="有指令重排序"><br>经过指令重排序的确可以提程序运行效率，所以现代计算机都会对指令进行重排序，但是这种重排序也不是无脑重排序，重排序的基础是前后语句不存在依赖关系时，才有可能发生指令重排序。所以A类的methodB方法不会发生指令重排序。指令重排序在单线程环境里面这不会有什么问题，但是多线程中就可能发生意外。比如线程1中执行如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">instance.methodA();</span><br></pre></td></tr></table></figure>
+<p>另一个线程2执行如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">while(instance.a != 4)&#123; //a只要不等4，线程就让出CPU，等待调度器再次执行此线程</span><br><span class="line">	Thread.yield(); //让出CPU，线程进入就绪态</span><br><span class="line">&#125;</span><br><span class="line">System.out.print(instance.b);</span><br></pre></td></tr></table></figure>
+<p>其中instance是A类的一个实例。如果线程1 发生了指令重排序， 那么这线程2的打印结果很有可能是false,这就和我们对代码的直观观察结果出处很大。如果线上产品出错的原因是指令重排序导致的，几乎不能可能排查出来。</p>
+</li>
+<li><p><strong>操作可见性 </strong> :<br>在“操作有序性” 中的线程线程2 ，还有可能会没有任何输出结果。因为线程2  要想有输出必须要满足instance.a =4,但这是在线程1中调用methodA 方法后instance.a 的值才为4 。而要想让线程2 看到这个新值，必须要把线程1的修改及时写回内存， 同时通知线程2 存在缓存系统中的instance.a值已经过期，需要去内存中获取最新值。如果我们的类A和线程1、线程2调用的代码没有特殊的声明，那么操作系统不能保证上述过程一定发生。即可能发生线程1对instance.a的修改对线程2不一定可见,这就是操作的可见性问题。</p>
+</li>
+</ol>
+<h3 id="java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。"><a href="#java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。" class="headerlink" title="java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。"></a>java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。</h3><p>上面介绍了现代计算机的内存模型以及其引起的在并发编程的三个问题，下面来介绍下java的内存模型。java为了实现其夸平台的特性，使用了一种虚拟机技术，java程序运行在这虚拟机上，那么不管你是windows系统，linux系统，unix系统，只要我java虚拟机屏蔽一切操作系统带来的差异，向java程序提供专用的、各系统无差别的虚拟机，那么java程序员就不需要关心底层到底是什么操作系统了。对于int类型的变量其取值范围永远是 -2^31 -1 至 2^31，即4个字节。但是对C\C++,这个操作系统的int可能是4字节，那个可能是8字节。C++程序员跨平台写代码，痛苦异常。这个给我们编程带来极大方便的虚拟机就是大名鼎鼎的JVM(Java Virtual Machine)。既然是虚拟机那么就需要模拟真正物理机的所有设备，像CPU，网络，存储等。和我们程序员最密切的就是JVM的存储，这就是java内存模型(Java Memory Model 简称JMM)。有别于我们真实的物理存储模型，JMM把存储分为线程栈区和堆区。在JVM中的每个线程都有自己独立的线程栈，而堆区用来存储java的对象实例。java中各种变量的存储有一下规则：</p>
+<ol>
+<li>成员变量一定存储在堆区。</li>
+<li>局部变量如果是基本数据类型存储在线程栈中，如果是非基本数据类型存储，其引用存储在线程栈中，但具体的对象实例还是存储在栈中。</li>
+</ol>
+<p>因为java内存模型是在具体的物理内存模型的基础上实现的，并且为了运行效率，java也支持指令重排序。所以java并发编程也有“原子性”、“有序性”、“可见性”三个问题。但是，我们的JMM也不是白吃干饭什么也做的，最起码运行在JVM上的代码就具备8个内存特性，来使得java代码有一定的“有序性”和“可见性”。这些特性也被称为 <strong>happen-before原则</strong>。下面先列举这个八个内存特性，详细介绍请看<a href="www.baidu.com"><font color="green"> java happen-before原则最全最易懂介绍</font></a>。<br>八大happen-before 特性：</p>
+<ul>
+<li>单线程happen-before原则：在同一个线程中，书写在前面的操作happen-before后面的操作。</li>
+<li>锁的happen-before原则：<strong>同一个锁</strong>的unlock操作happen-before此锁的lock操作。</li>
+<li>volatile的happen-before原则：对一个volatile变量的写操作happen-before对此变量的任意操作(当然也包括写操作了)。</li>
+<li>happen-before的传递性原则：如果A操作 happen-before B操作，B操作happen-before C操作，那么A操作happen-before B操作。</li>
+<li>线程启动的happen-before原则：同一个线程的start方法happen-before此线程的其它方法。</li>
+<li>线程中断的happen-before原则：对线程interrupt方法的调用happen-before被中断线程的检测到中断发送的代码。</li>
+<li>线程终结的happen-before原则：线程中的所有操作都happen-before线程的终止检测。</li>
+<li>对象创建的happen-before原则：一个对象的初始化完成先于他的finalize方法调用。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/java并发/" rel="tag"># java并发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/10/jcip-2/" rel="next" title="《java并发编程实战》第二章：线程安全">
+                <i class="fa fa-chevron-left"></i> 《java并发编程实战》第二章：线程安全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/26/8-happen-before-principle/" rel="prev" title="java 8大happen-before原则超全面详解">
+                java 8大happen-before原则超全面详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">aworker</p>
+              <p class="site-description motion-element" itemprop="description">听，寂寞在唱歌</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:lmyuanwork@163.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。"><span class="nav-number">1.</span> <span class="nav-text">java多线程的所有问题都植根于“操作原子性”、“操作有序性”、“操作可见性”而引发的。</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">aworker</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
