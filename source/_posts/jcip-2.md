@@ -8,10 +8,8 @@ tags: java并发
 第二章在第一章的基础上告诉读者在重要的多线程开发中线程安全的重要性，随着计算机硬件的发展，我们可以利用多核心cpu并发能力来让多个程序同时运行，这是这样计算机的效率就非常高，这是多线程开发的优点。但是要想享受这个优点，就要遵守多线程开发的“规则”。这个规则就是第二章介绍的-线程安全。作者在章首表达了两个观点：
 >A program that omits needed synchronization might appear to work, passing its tests and performing well for years, but it is still broken and may fail at any moment.
 >It is far easier to design a class to be thread-safe than to retrofit it for thread safety later.
-<div align=right><b> Java Concurrency in Practice</b><div>
-    
+ 
 <!-- more -->
-
 两个观点分别强调线程安全在多线程环境的必要性：
 1. 你本应该应用并发的代码即使已经在生产环境中运行了很久，并且表现良好，但是它们也随时有可能崩溃。
 2. 去修复一个类或者一段代码来保证它们是线程安全的远比当初就把它们设计成线程安全的要复杂的多。
@@ -34,6 +32,7 @@ other coordination on the part of the calling code.
 这点就很好解释了，银行保证你卡里面的500元钱不管你怎么折腾都不会多，不管你是去ATM取钱，拿支付宝转账，用微信买瓶饮料。钱数该减少10元时候它绝对不会增加1元，该增加1元的时候它也绝对不会减少1分。
 
 有童鞋可能会说，这两个条件不是天经地义的吗？本来就应该这样啊，但是啊，你认为的天经地义是习惯成自然的结果，就和你丢了钱去找警察，买个东西要交钱都是后天条件反射。对于咿呀学语的小孩纸来说，这些都不那么自然，都要问下为什么。以下面的银行卡类和ATM类，对刚才的两条进行详细说明。
+
 ```
 public class BankCard {
     private int money;
@@ -71,7 +70,8 @@ public class BankCard {
             return;
         }
     }
-}```
+}
+```
 
 ```
 public class ATM {
@@ -98,7 +98,9 @@ public class ATM {
     public void drawMoney(int money){
         card.subMoney(money);
     }
-} ```
+} 
+```
+
 结合[ <font color=green> 《java并发编程实战》之java内存模型 </font> ](http://aworker.cn/2017/10/18/java-memory-model/)和线程安全的类的定义，我们知道BankCard是线程不安全的，当你和你妻子在不同的ATM机上通过输入账号密码来取钱时候（不用插卡的ATM机，没见过吧）。用代码模拟如下：
 你自己存钱:
 ```
