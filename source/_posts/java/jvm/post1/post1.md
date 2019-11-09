@@ -25,6 +25,7 @@ java虚拟机内存，是java虚拟机进行对象内存空间分配、垃圾回
 + -Xms ：表示虚拟机堆的最小值，如 -Xms10M 表示堆的最小值为10MB
 + -Xmx ：表示虚拟机堆的最大值，如果 -Xmx100M 表示堆的最大值为100MB
 
+
 ```
 /**
  * 设置虚拟机参数为：-Xms5M -Xmx5M
@@ -40,13 +41,17 @@ public class HeapOOM {
     }
 }
 ```
+
 执行结果:
+
 ```
 Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
 	at jvm.post1.HeapOOM.main(HeapOOM.java:15)
 ```
+
 “Java heap space”类型的OOM表示堆中没有可用的内存空间，具体到本例子中就是在大小为5M的堆中没有可用空间分配给大小为1M的数组对象。再来看一个例子：
-```aidl
+
+```
 /**
  * @createtime 2019/11/2
  * 虚拟机参数 -Xms5M -Xmx5M 
@@ -60,11 +65,14 @@ public class HeapOOM1 {
     }
 }
 ```
+
 执行结果:
-```aidl
+
+```
 Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceeded
 	at jvm.post1.HeapOOM1.main(HeapOOM1.java:14)
 ```
+
 “GC overhead limit exceeded” 类型的OOM是在jdk6后引入的一种新的错误类型。发生错误的原因是虚拟机用了大量的时间进行GC但是只释放了较小的空间，这是虚拟机的一种保护机制。具体到本例子中就是虚拟机在GC时没有能回收内存空间，浪费了时间却没有收获，所以就抛出了这个错误。可以用 *-XX:-UseGCOverheadLimit*参数禁用这个检查，但解决不了内存问题，只是把错误的信息延后，替换成 java.lang.OutOfMemoryError: Java heap space错误。
 
 ## 方法区
@@ -84,10 +92,8 @@ Exception in thread "main" java.lang.OutOfMemoryError: GC overhead limit exceede
 + 调用String对象的intern方法会返回一个存放在常量池中的String对象,且两个对象内容相同。
 
 再回到本篇的主题上，因为常量池位置的变化，在不同的jdk版本下，下面代码的执行结果是不一样的：
-```aidl
-/**
- * @description java常量池
- */
+
+```
 public class ConstantsPool {
     public static void main(String[] args) {
 
@@ -96,7 +102,10 @@ public class ConstantsPool {
         System.out.println(s == s1); //jdk5和jdk6中返回false，jdk7及其以上版本返回true。
     }
 }
-``` 
+
+```
+
+
 
 在jdk7之前，程序在执行//2处代码之前常量池中没有"HelloJvm"这个字符串常量，//2处代码执行时，程序会在常量池中创建一个"HelloJvm"的字符串对象s1并返回，而常量池是在方法区的。那一个在堆中的s对象和方法区中的s1对象比较地址是否相同，当然会得到false。
 在jdk7及其以后的版本，程序在执行//2出代码时，发现常量池中同样没有"HelloJvm"这个对象，但因为常量池已经迁移到堆中，常量池不需要存储一个对象了，程序只是简单的把s这个对象的引用在常量池中存储了，此时s和s1指向的是同一个对象，结果当然是true。
@@ -113,16 +122,19 @@ jdk8及其以后的版本，元空间直接使用物理机的本地内存，在�
 + -XX:MaxMetaspaceSize ： 表示虚拟机元空间的最大值为MaxMetaspaceSize，如 -XX:MaxMetaspaceSize=15M 表示元空间的最大值为15M，再大就会发生OOM异常。
 
 关于元空间的的内存溢出模拟，我们需要借助CGLib来动态的创建类，先引入如下maven依赖：
-```aidl
+
+```
 <dependency>
     <groupId>cglib</groupId>
     <artifactId>cglib-nodep</artifactId>
     <version>3.3.0</version>
 </dependency>
+
 ```
 
 具体代码如下：
-```aidl
+
+```
 /**
  * 虚拟机参数 -XX:MaxMetaspaceSize=10M 
  * @description 元空间内存溢出
@@ -142,7 +154,8 @@ public class MetaSpaceOOM {
 }
 ```
 
-执行结果为：
+ 执行结果为：
+
 ```aidl
 Exception in thread "main" java.lang.IllegalStateException: Unable to load cache item
 	at net.sf.cglib.core.internal.LoadingCache.createEntry(LoadingCache.java:79)
@@ -173,7 +186,8 @@ Caused by: java.lang.OutOfMemoryError: Metaspace
 
 在介绍堆时，我们曾说过几乎所有的对象都是在堆中创建的，这几乎中的特例就来自于栈，对象是可以在栈上创建，我们称为栈上分配。
 
-```aidl
+```
+
 /**
  * 执行栈上分配的虚拟机参数  -XX:+DoEscapeAnalysis -XX:+EliminateAllocations -Xmx10M
  * 不执行栈上分配的虚拟机参数  -XX:-DoEscapeAnalysis -XX:+EliminateAllocations -Xmx10M
@@ -203,6 +217,7 @@ public class StackAllocation {
         System.out.println(endTime - startTime);
     }
 }
+
 ```
 
 用不同的虚拟机参数执行上面的代码时，会发现同样执行1亿次方法调用，栈上分配的执行时间明显比非栈上分配的执行时间短。简单的解释就是1亿个的User对象不是被分配在堆上，这样就避免了频繁的GC，对性能自然有很大提升。
@@ -212,7 +227,8 @@ public class StackAllocation {
 
 线程栈是用来存方法的栈帧的。线程栈越大其能调用的方法深度越大，运行如下代码可以印证此观点：
 
-```aidl
+```
+
 /**
  * 虚拟机参数 -Xss1000K
  * @description 模拟栈内存溢出
@@ -234,6 +250,7 @@ public class StackOverFlowOOM {
         }
     }
 }
+
 ```
 
 当Xss的值越大时，程序中的num变量在栈溢出异常时的值越大。jdk8中如果不指定Xss参数的大小，那么其默认值为1MB，这也从内存角度印证线程是一种昂贵的资源，即使简单的创建一个线程而不分配给其处理任务，其也要占用一些内存空间。
@@ -245,7 +262,7 @@ public class StackOverFlowOOM {
 
 
 
-#篇尾小节
+## 篇尾小节
 
 本篇主要简绍了java虚拟机在运行时的各个内存区域，简单介绍了它们的作用和内存溢出的方式。
 

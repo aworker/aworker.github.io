@@ -78,6 +78,6 @@ theme: 3-hexo
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
- # repo: https://github.com/aworker/aworker.github.io.git
+#  repo: https://github.com/aworker/aworker.github.io.git
   repo: git@github.com:aworker/aworker.github.io.git
   branch: master

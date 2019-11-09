@@ -165,7 +165,7 @@ code:
 highlight:
   on: true # true开启代码高亮
   lineNum: true # true显示行号
-  theme: atom-light
+  theme: katom-dark
 # 代码高亮主题,效果可以查看 https://highlightjs.org/static/demo/
 # 支持主题：
 # sublime : 参考sublime的高亮主题
@@ -198,7 +198,7 @@ friends:
 
 ##########评论设置#############
 comment:
-  on: false
+  on: true
   type: gitalk  # 评论系统：gitalk、disqus、gentie、gitment,注意：使用时，在下方对应位置进行配置
   comment_count: true  # 文章标题下方显示评论数
   preload_comment: false  # 预加载评论区
@@ -218,11 +218,11 @@ gentie:
   # 网易云跟帖暂时不支持查询评论数，所以启用时，把评论数关掉，上方comment_count: false。
 
 gitalk:
-  githubID: yelog
-  repo: yelog.github.io
+  githubID: aworker
+  repo: aworker.github.io
   ClientID:
   ClientSecret:
-  adminUser: yelog
+  adminUser: aworker
   distractionFreeMode: true
   language: zh-CN
   perPage: 10
