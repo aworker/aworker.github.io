@@ -16,7 +16,7 @@ java虚拟机是一个抽象的计算机。对于程序开发人员来说，我�
 
 HotSpot虚拟机的组件结构如下：
 
-![运行时栈结构](https://github.com/aworker/aworker.github.io/raw/hexo/java/jvm/post0/HotSpot-architecture.jpg) 
+![运行时栈结构](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg) 
 
 HotSpot虚拟机有三大主要模块：
 
