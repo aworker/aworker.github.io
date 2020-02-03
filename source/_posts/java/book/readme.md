@@ -2,7 +2,7 @@
 title: 我的读书清单
 date: 2020-01-30 15:36:13
 categories:
-    - 读书
+    - book
 tags:
 ---
 
@@ -17,3 +17,7 @@ tags:
 1、[绑架游戏]()
 
 2、[恶意]()
+
+## 2019年书单
+
+1、[Java Concurrency In Practice]()
