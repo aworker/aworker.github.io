@@ -61,6 +61,29 @@ public class DemoSpringCircularDependencies {
 
 + 学习本文前需要对spring的基于注解的bean管理配置方式有基本的了解，不然看不懂上述4个类的作用，那么就无从谈及学习spring源码了，本系列的文章也不是基本的spring配置学习文章，这部分知识自行google。
 
++ 需要对jdk8的lambda有基础的了解。
+
+# 3、源码分析
+
+## 3.1、源码栈帧
+首先我们先看下需要分析的源码的主要栈帧：
+
+![源码栈帧图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/spring/post1/bean_create_process_of_CD.jpg)
+
+先对上图做简单的说明，上图中的每蓝色小块代表一个方法，里面的数字部分表示方法的执行先后顺序（数字小的先执行）。两个相邻的方法之间大数字方法是程序在执行小数字方法的过程中要调用的方法（和debug时的的栈信息类似）。我们对源码的分析也将按照“创建所有单例Bean”，“创建Chicken对象”，“填充Chicken对象属性”，“创建Egg对象”，“填充Egg对象属性”，“获取Chicken对象”的顺序进行。
+
+## 3.2、 创建所有单例Bean
+
+方法1. 是AnnotationConfigApplicationContext类的构造方法，构造方法引出对Bean的初始化创建操作。其中可以留意下
+
+
+
+# 4、 总结
+
++ spring之所以默认是前置加载的正如其
+
+
+
 
 
 
