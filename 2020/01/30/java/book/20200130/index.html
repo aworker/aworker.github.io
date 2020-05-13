@@ -6,15 +6,19 @@
   <meta name="keywords" content="">
   <meta name="description" content="绑架游戏 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<meta name="description" content="个人简介aworker， 毕业于东北哪所大学，目前在贝壳找房从事java后端开发工作。 喜欢研究新兴技术和未来发展方向，有任何疑问都欢迎你留言，留言必回。 最近最近在写java虚拟机方面的文章 联系方式 邮箱 : lmyuanwork@163.com">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于作者">
-<meta property="og:url" content="http:&#x2F;&#x2F;aworker.cn&#x2F;about&#x2F;index.html">
+<meta name="description" content="0 看前必读先看下00 spring源码剖析系列说明 1 什么是循环依赖循环依赖在spring框架中有一个专有名词叫 Circular dependencies，其具体是指受spring管理的两个bean对象 Bean1和Bean2，Bean1中有成员变量Bean2；Bean2中有成员变量Bean1。具体代码case如下： 代码结构如图：  前前后后一共使用了四个类，其中两个Bean类如下： 12">
+<meta property="og:type" content="article">
+<meta property="og:title" content="01 spring解决循环源码分析">
+<meta property="og:url" content="http:&#x2F;&#x2F;aworker.cn&#x2F;2020&#x2F;05&#x2F;08&#x2F;java&#x2F;spring&#x2F;post1&#x2F;post1&#x2F;index.html">
 <meta property="og:site_name" content="每天进步点">
-<meta property="og:description" content="个人简介aworker， 毕业于东北哪所大学，目前在贝壳找房从事java后端开发工作。 喜欢研究新兴技术和未来发展方向，有任何疑问都欢迎你留言，留言必回。 最近最近在写java虚拟机方面的文章 联系方式 邮箱 : lmyuanwork@163.com">
+<meta property="og:description" content="0 看前必读先看下00 spring源码剖析系列说明 1 什么是循环依赖循环依赖在spring框架中有一个专有名词叫 Circular dependencies，其具体是指受spring管理的两个bean对象 Bean1和Bean2，Bean1中有成员变量Bean2；Bean2中有成员变量Bean1。具体代码case如下： 代码结构如图：  前前后后一共使用了四个类，其中两个Bean类如下： 12">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-11-20T12:46:47.939Z">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;aworker&#x2F;aworker.github.io&#x2F;raw&#x2F;hexo&#x2F;source&#x2F;_posts&#x2F;java&#x2F;spring&#x2F;post1&#x2F;spring_post1_code_struct.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;aworker&#x2F;aworker.github.io&#x2F;raw&#x2F;hexo&#x2F;source&#x2F;_posts&#x2F;java&#x2F;spring&#x2F;post1&#x2F;bean_create_process_of_CD.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;aworker&#x2F;aworker.github.io&#x2F;raw&#x2F;hexo&#x2F;source&#x2F;_posts&#x2F;java&#x2F;spring&#x2F;post1&#x2F;cache_process_of_CD.jpg">
+<meta property="og:updated_time" content="2020-05-13T09:44:07.233Z">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;aworker&#x2F;aworker.github.io&#x2F;raw&#x2F;hexo&#x2F;source&#x2F;_posts&#x2F;java&#x2F;spring&#x2F;post1&#x2F;spring_post1_code_struct.png">
 
 
 <link rel="icon" href="/img/avatar.jpg">
