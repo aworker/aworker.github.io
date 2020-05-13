@@ -34,3 +34,7 @@ spring可以说是在web1.0时代java最流行的ssh框架（Struts，Spring，H
 </dependency>
 ```
 
+
+系列文章建议的学习顺序如下：
+
+[1、spring解决循环源码分析](http://aworker.cn/2020/05/08/java/spring/post1/post1/)

@@ -6,8 +6,13 @@ categories:
     - spring源码剖析系列
 tags:
 ---
+# 0 看前必读
+
+先看下 
+[00 spring源码剖析系列说明](http://aworker.cn/2020/05/07/java/spring/post0/post0/)
 
 # 1 什么是循环依赖
+
 
 循环依赖在spring框架中有一个专有名词叫 *Circular dependencies*，其具体是指受spring管理的两个bean对象 Bean1和Bean2，Bean1中有成员变量Bean2；Bean2中有成员变量Bean1。具体代码case如下：
 
