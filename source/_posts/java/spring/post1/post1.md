@@ -153,6 +153,16 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 ![数据流通图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/spring/post1/cache_process_of_CD.jpg)
 
+图中每个状态图都有一个“[a,b)”形式的步骤指示器，其中a,b分别表示 “3.1小节” 中源码栈帧图中一个方法数字，而括号用的是高等数学中常见的方式左闭右开方式，表示在程序在执行方法a到方法b（包含a不包含b）过程中缓存数据的状态和其下面的表格一致。
+
+通过对八个表格数据的观察我们可以发现，对于同一个beanName所映射的对象，基本上经历从第三级缓存、第二级缓存、第一级缓存，的一个升级过程。而对网上经常困惑的第三级缓存的作用（认为第三级缓存没有必要存在）,博主认为存在第三级缓存是基于以下两个事实的：
+
+1. 某些Bean对象（并不是所有的bean对象）在创建过程中且尚未创建完时就会被其它Bean对象所引用的问题（就是循环依赖，貌似是一句废话^_^）。
+
+2. Bean的生命周期过程是一个成本较高的过程。
+
+本文中只有Chicken 对象在创建过程中有被其它对象引用而Egg对象没有。因为第三级缓存存储的是一个raw bean后续创建的方法，那么对于在创建时被其它对象引用的Chicken对象来说，可以执行完第三级缓存中存储的bean对象后续的处理方法（AOP的功能就是在此实现的）后将Chicken bean返回，对于没有在创建过程中被引用的Egg对象来说，其只是浪费第三级缓存中的一点点内存，而避免重复执行spring对Egg Bean的某些生命周期逻辑的重复执行，这些重复的逻辑很可能是很高成本的过程，如AOP的实现。
+
 
 
 
@@ -160,7 +170,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 # 5 总结
 
-+ spring之所以默认是前置加载的正如其
+编程界有个很著名的说法：“算法加数据结构等于程序”，本文的“3 源码分析”和“4 缓存数据变化”分别充当了spring解决基于@AutoWired注解的Bean的循环依赖程序中的算法和数据结构。和理解其关键是对“**三Map一Set**”数据变化的深入理解。
 
 
 
