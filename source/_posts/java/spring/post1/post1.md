@@ -123,19 +123,19 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 紧接上面小节，spring通过方法17. resolveCandidate将找到的合适beanName(egg)传递下来，通过方法18. getBean 来执行对Egg Bean对象的获取操作。此小节调用的方法栈和 “*3.3 创建chicken对象*” 小节的方法栈是一样的，唯一的区别是3.3小节传递的beanName参数值为chicken，而本小节传递的beanName参数为egg。
 
-## 3.5 填充Egg对象属性
+## 3.6 填充Egg对象属性
 
 本小节对标的是 “*3.4 填充Chicken对象属性*”小节，两个小节调用的方法栈是一样的，区别也是参数的不同而已。Spring发现Egg对象需要注入一个Chicken对象。
 
-## 3.6 获取Chicken对象
+## 3.7 获取Chicken对象
 
 这里我们分析的方法31. getBean 和方法18. getBean都是因为我们自己定义的Bean对象中有需要的注入的Bean对象。但是方法31. 传递的参数是chicken，而Chicken对象在 3.3小节中分析得知，其在三Map一Set中的第三级缓存*singletonFactories*存放了一个对应的ObjectFactory对象。spring通过这个ObjectFactory对象获取到了对应的Chicken 对象，而避免了循环依赖。
 
-## 3.7 缓存创建完的Egg 和缓存创建完的Chicken
+## 3.8 缓存创建完的Egg 和缓存创建完的Chicken
 
 通过3.6小节我们获取到了Egg对象需要的成员变量Chicken对象。随着方法栈帧的层层返回，我们将焦点聚焦在由方法21.返回后的方法20.中，在程序执行完方法21. getObject 并获取到经历完Bean生命周期的Egg Bean后，其在方法20. 中还要执行两个比较重要的方法 **afterSingletonCreation** 和 **addSingleton**，其中前者会把三Map一Set中的Set对象singletonsCurrentlyInCreation中的egg移除，表示此Bean对象不是正在创建的Bean对象，Bean创建已经完成；后者会把Egg Bean存放在一级缓存中，同时清空二级缓存和三级缓存中egg对应的映射，至此Egg Bean的spring生命周期已经大体完成。Chicken对象也会执行**afterSingletonCreation** 和 **addSingleton** 两个方法来完成Chicken Bean的spring生命周期。
 
-## 3.8 源码分析小结
+## 3.9 源码分析小结
 
 + 创建chicken对象、创建Egg对象：步骤主要解决一个Bean的raw bean对象的创建和的前期准备工作,和本文循环依赖相关的主要是对三Map一Set的对象的保存的内容的修改。
 
@@ -149,7 +149,7 @@ protected Object getSingleton(String beanName, boolean allowEarlyReference) {
 
 在 “3 源码分析” 章节中，随着程序运行过程中除了有由方法调用和方法返回而产生的线程方法栈图中方法的压栈和出栈外。在这进进出出的背后发生改变的是我们的**三Map一Set** 中的数据。
 
-在源码分析的开头小节“*3.3 创建Chicken对象*” 和结尾小节“3.7 缓存创建完的Egg 和缓存创建完的Chicken”我们有对三Map一Set的分析，但着并不是说只有这两个小节的部分有数据变更，而是其缓存变化的原理和这连个小节一直，唯一的区别是方法调用的参数不同。整个数据变化图如下：
+在源码分析的开头小节“*3.3 创建Chicken对象*” 和结尾小节“3.8 缓存创建完的Egg 和缓存创建完的Chicken”我们有对三Map一Set的分析，但着并不是说只有这两个小节的部分有数据变更，而是其缓存变化的原理和这连个小节一直，唯一的区别是方法调用的参数不同。整个数据变化图如下：
 
 ![数据流通图](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/spring/post1/cache_process_of_CD.jpg)
 
