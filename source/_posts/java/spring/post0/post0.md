@@ -5,6 +5,7 @@ categories:
     - spring
     - spring源码剖析系列
 tags:
+character: 1. 及时更新如果spring版本有升级，本代码也会跟着升级
 ---
 
 spring可以说是在web1.0时代java最流行的ssh框架（Struts，Spring，Hibernate) 中三元老的一员，追溯历史也有20年之久了。
