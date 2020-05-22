@@ -1,5 +1,5 @@
 ---
-title: 01 java并发知识入门
+title: 01 java并发编程要解决的三大问题
 date: 2020-05-17 13:28:13
 categories:
     - java并发
