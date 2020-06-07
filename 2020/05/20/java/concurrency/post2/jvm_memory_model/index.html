@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>00开篇 | 每天进步点</title>
+  <title>02 java内存模型和java语言帮手 | 每天进步点</title>
   <meta name="keywords" content="">
-  <meta name="description" content="00开篇 | 每天进步点">
+  <meta name="description" content="02 java内存模型和java语言帮手 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="听，寂寞在唱歌">
 <meta property="og:type" content="website">
@@ -317,9 +317,9 @@
 </aside>
 <div class="post">
     <div class="pjax">
-        <article id="post-java/jvm/post0/post0" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-java/concurrency/post2/jvm_memory_model" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">00开篇</h1>
+        <h1 class="article-title">02 java内存模型和java语言帮手</h1>
     
     <div class="article-meta">
         
@@ -327,9 +327,9 @@
         
         <span class="book">
             
-                <a href="javascript:" target="_blank" data-rel="jvm noopener">jvm</a>/
+                <a href="javascript:" target="_blank" data-rel="java并发 noopener">java并发</a>/
             
-                <a href="javascript:" target="_blank" data-rel="java虚拟机，说点不一样的 noopener">java虚拟机，说点不一样的</a>
+                <a href="javascript:" target="_blank" data-rel="java并发原理及实践 noopener">java并发原理及实践</a>
             
         </span>
         
@@ -337,7 +337,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-01-30 17:04:16'>2019-11-09 16:36</time>
+        创建时间:<time class="date" title='更新时间: 2020-06-05 09:49:26'>2020-05-20 20:06</time>
         
     </div>
     <div class="article-meta">
@@ -370,7 +370,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-java内存模型"><span class="toc-text">1 java内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-计算机物理内存模型"><span class="toc-text">1.1 计算机物理内存模型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-正确性三大问题"><span class="toc-text">1.2 正确性三大问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-java内存模型"><span class="toc-text">1.3 java内存模型</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-java语言对并发编程的支持"><span class="toc-text">2 java语言对并发编程的支持</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -386,24 +386,56 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>有别于C/C++语言，java虚拟机解放了java程序员，使我们在开发过程中不必负责每个对象的出生和死亡，我们只管用new关键字创建对象，使用对象，对于不在使用的对象所占的内存空间的回收，完全交给java虚拟机来负责。在程序内存管理领域，java虚拟机即让我们避免成为分配对象内存，回收对象内存这样单调工作的奴隶；也让我们丧失了成为掌握对象内存空间管理“生杀大权”的皇帝，内存管理对我们越发的陌生和透明，一旦有内存泄露或者溢出以及涉及到虚拟机方面的性能调优，都会让我们手足无措。《也谈java虚拟机，说点不一样的》系列文章，力求用简单，生动，具体的讲述风格讲解java虚拟机的运作机制，让广大java开发人员得以管窥一二，在实际工作中、在面试找工作时、在饭后和同事吹逼时，都能得心应手，从容应对。鉴于java虚拟机知识体系的庞杂和深邃以及本员能力的限制，系列文章中难免有错误和不足，希望大家多多包涵。</p>
-<p>java虚拟机是一个抽象的计算机。对于程序开发人员来说，我们只需要编写好我们的程序，让不同平台上的java虚拟机完成java代码到不同操作系统计算机指令的转化，通过这种方式java语言实现了其夸平台特性。虽然名为java虚拟机，但是它并不是和java语言强绑定的，java虚拟机只能识别有特定语法格式的class文件，而所有能编译为class文件的语言，都可以在java虚拟机上运行，java虚拟机不是“java语言的虚拟机”而是“多语言的虚拟机”。</p>
-<p>在java虚拟机的发展历史上，曾经有很多的优秀的虚拟机实现。如随着jdk1.0一起发布的Classic VM，号称速度最快的JRockit VM，以及专精Windows平台的Microsoft JVM等。但我们普通程序员用的最多的也是“血统最纯正”虚拟机实现就是Sun公司发布的HotSpot VM，这个系列也以HotSpot虚拟机为蓝本进行讲述的。</p>
-<p>HotSpot虚拟机的组件结构如下：</p>
-<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg" alt="HotSpot虚拟机组件结构"> </p>
-<p>HotSpot虚拟机有三大主要模块：</p>
-<ul>
-<li>类加载子系统，主要用来加载class文件，从中获取类信息。</li>
-<li>虚拟机运行时数据区，主要存储程序运行时的各种对象信息和线程栈帧数据。</li>
-<li>执行引擎，主要内存垃圾回收和运行时代码优化。</li>
-</ul>
-<p>本系列将会从实际应用、面试需要、饭后吹逼等三个角度分别讲解这三大主要模块。同时给自己立个flag到2020年6月能完成本系列文章的全部写作。</p>
-<blockquote>
-<p>有任何不懂或者质疑的地方，都欢迎大家积极留言讨论，留言必回，一起学习进步。</p>
+        <h1 id="1-java内存模型"><a href="#1-java内存模型" class="headerlink" title="1 java内存模型"></a>1 java内存模型</h1><blockquote>
+<p>“如欲征服java并发，需先征服java内存模型，如欲征服java内存模型，需先征服计算机内存模型” -糖炒甜板栗</p>
 </blockquote>
-<!-- 
-参考文献 https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
--->
+<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/concurrency/post2/leader_speak.jpg" alt="大佬讲话"></p>
+<p>咳！咳！，大家都做笔记了吧。虽然栗子不是什么大佬，但是这句话说的还是没有毛病的。不了解java的内存模型，就不会从根上理解java并发的一些行为和机制，而java内存模型毕竟是jvm模拟出来的一部分，其底子还是建立在现代计算机的物理内存模型上来的，所以我们就按照现代计算机的物理内存模型、java内存模型的顺序来仔细介绍，为彻底了解java并发机制打下底子。</p>
+<h2 id="1-1-计算机物理内存模型"><a href="#1-1-计算机物理内存模型" class="headerlink" title="1.1 计算机物理内存模型"></a>1.1 计算机物理内存模型</h2><p>现代计算机的物理内存模型：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/concurrency/post2/memory_model_physical.png" alt="现代计算机的物理内存模型"><br>现在计算机最少的都是应该是两核心了，当然我们也经常在买个人电脑的时候听过四核四线程、四核八线程等，可以说现在个人电脑标配都是四核心了，为了方便上图只是列举了2个核心。现代计算机的内存在逻辑上还是一块。有人可能问栗子说，不对啊，我电脑就插了两块内存条，但是操作系统会把两块内存的地址统一抽象，比如每一块的内存是2048MB地址是000000000000-011111111111MB，两块就是0000000000000-1000000000000MB，操作系统会统一编址。所以整体上看还是一块内存。因为CPU的操作速度太快，如果让CPU直接操作内存，那么就是对CPU资源的一种巨大浪费，为了解决这个问题现在计算机都给CPU加上缓存，比如一级缓存，二级缓存，甚至三级缓存。缓存速度比内存快，但是还是赶不上CPU的速度级别，所以在缓存和CPU之间又有了register,register的存储速度比缓存就快了好多了。<br>存储速度上有如下关系：<br>register &gt; 一级缓存 &gt; 二级缓存 &gt; … &gt; n级缓存 &gt; 内存<br>容量上一般有如下关系：<br>内存 &gt; n级缓存 &gt; … &gt; 二级缓存 &gt; 一级缓存 &gt; register<br>之所以可以用缓存和register来缓解CPU和内存之间巨大的速度差别是基于如下原理：</p>
+<p><strong>CPU访问过的内存地址，很有可能在短时间内会被再次访问</strong><br>比如CPU访问了地址为0x001fffff的内存地址，如果没有缓存和register，那么CPU再下次访问这个内存地址的时候就还要去内存读，但是如果有缓存，缓存会把CPU访问过的数据先存储起来，等CPU待会再找地址为0x001fffff的内存地址时候，发现其在缓存中就存在了，那么好了，这就不用在访问内存了，速度自然就提升了。这就涉及到计算机组成原理的知识了，如果想了解可以google一下，这里就不在做更深的介绍了到这里就够用了。</p>
+<h2 id="1-2-正确性三大问题"><a href="#1-2-正确性三大问题" class="headerlink" title="1.2 正确性三大问题"></a>1.2 正确性三大问题</h2><p>了解现代计算机物理内存模型工作原理后，那么再理解java并发编程中和<strong>正确性问题</strong>关系最紧密的三个问题就很好理解了。先介绍下三个问题：</p>
+<ol>
+<li><p><strong>操作原子性</strong>：一个操作要么全做，要么全不做，那么这个操作就符合原子性。比如栗子把刚发的500块工资转给老婆，就包括两个操作，自己账户先减500，老婆的账户加500，这个转账操作应该满足原子性。如果银行只执行了栗子账户的扣钱操作，没有执行给老婆达人账户的加钱操作。丢了500块钱是小事，被老婆大人罚跪搓衣板可就不得了了。所以你自己账户减钱，老婆账户加钱，这两个操作要么都做了，要么都别做。例如如下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">a = a + 1;</span><br></pre></td></tr></table></figure>
+<p>结合我们上述的现代计算机的内存模型，计算机执行a=a+1时候会分成三个原子性操作：</p>
+<ol>
+<li>把a的值（比如4）从内存中取出放到CPU的缓存系统中</li>
+<li>从缓存系统中取出a的值加1（4+1）得到新结果</li>
+<li>把新结果存回到内存中</li>
+</ol>
+<p>一个“a=a+1”操作在计算机中被拆分成三个原子性操作，那么完全可以出现CPU1执行完1.和2.操作后，去执行别的操作了，这时CPU2 从内存中获取到a的值就不是最新的值（因为操作3.没有执行）。这就是并发操作原子性问题的根本来源。</p>
+</li>
+<li><p><strong>操作有序性</strong>：例如如下代码： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class A &#123;</span><br><span class="line">   public int a;</span><br><span class="line">   public boolean b = false;</span><br><span class="line"></span><br><span class="line">   public void methodA()&#123;</span><br><span class="line">       a = 3;</span><br><span class="line">       b = true;</span><br><span class="line">       a = a + 1;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public void methodB()&#123;</span><br><span class="line">       a = 3;</span><br><span class="line">       b = (a == 4);</span><br><span class="line">       a = a + 1;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>methodA方法代码先经过java编译器编译成字节码，然后字节码被操作系统解释成机器指令，在这个解释过程中，操作系统可能发现，咦？在给变量b赋值为true后又操作了a变量，干脆我操作系统自己改改执行顺序，把对a变量的两个操作都执行完，然后再执行对b的操作,这就叫<strong>指令重排序</strong>。这样就会节省操作时间,如下图没有进行指令重排序时：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/concurrency/post2/before_instruciton_reorder.png" alt="没有指令重排序"><br>图中CPU和缓存系统要进行9次通信，缓存系统和内存要通信7次，假设cpu和缓存系统通信一次用时1ms，缓存系统和内存通信一次用时10ms，那么总用时 9乘1 + 7乘10 = 79ms。经过指令重排序后，总共用时  6乘1 + 6乘10 = 66ms 如下图所示：<br><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/concurrency/post2/after_instruction_reorder.png" alt="有指令重排序"><br>经过指令重排序的确可以提程序运行效率，所以java编译器、java虚拟机、操作系统都会对指令进行重排序，但是这种重排序也不是无脑重排序，重排序的基础是前后语句不存在依赖关系时，才有可能发生指令重排序。所以A类的methodB方法不会发生指令重排序，因为对比的赋值操作依赖变量a，而在单线程情况下methodA中对b的赋值在第二行还是第三行对结果没有影响。指令重排序在单线程环境里面这不会有什么问题，但是多线程中就可能发生意外。比如线程1中执行如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">instance.methodA();</span><br></pre></td></tr></table></figure>
+<p>另一个线程2执行如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">while(instance.a != 4)&#123; //a只要不等4，线程就让出CPU，等待调度器再次执行此线程</span><br><span class="line">	Thread.yield(); //让出CPU，线程进入就绪态</span><br><span class="line">&#125;</span><br><span class="line">System.out.print(instance.b);</span><br></pre></td></tr></table></figure>
+<p>其中instance是A类的一个实例。如果线程1 发生了指令重排序， 那么线程2的打印结果很有可能是false,这就和我们对代码的直观观察结果出处很大。如果线上程序出错的原因是指令重排序导致的，几乎不能可能排查出来。</p>
+</li>
+<li><p><strong>操作可见性</strong> :<br>在“操作有序性” 中的线程线程2 ，还有可能会没有任何输出结果。因为线程2  要想有输出必须要满足instance.a =4,但这是在线程1中调用methodA 方法后instance.a 的值才为4 。而要想让线程2 看到这个新值，必须要把线程1的修改及时写回内存， 同时通知执行线程2的CPU的缓存系统中的instance.a值已经过期，需要去内存中获取最新值。如果我们的类A和线程1、线程2调用的代码没有特殊的声明，那么操作系统不能保证上述过程一定发生。即可能发生线程1对instance.a的修改对线程2不一定可见,这就是操作的可见性问题。</p>
+</li>
+</ol>
+<p><strong>java并发编程关于“正确性问题”的错误都植根于多线程程序的“操作原子性”、“操作有序性”、“操作可见性”没有得到保证而引发的。</strong></p>
+<h2 id="1-3-java内存模型"><a href="#1-3-java内存模型" class="headerlink" title="1.3 java内存模型"></a>1.3 java内存模型</h2><p>上面介绍了现代计算机的内存模型以及其引起的在java并发编程中关于<strong>正确性问题</strong>的三个核心概念，下面来介绍下java的内存模型。java为了实现其夸平台的特性，使用了一种虚拟机技术，java程序运行在这虚拟机上，那么不管你是windows系统，linux系统，unix系统，java虚拟机会屏蔽一切操作系统带来的差异，向java程序提供专用的、各系统无差别的虚拟机，那么java程序员就不需要关心底层到底是什么操作系统了。对于int类型的变量其取值范围永远是 -2^31 -1 至 2^31，即4个字节。但是对C\C++,这个操作系统的int可能是4字节，那个可能是8字节。C++程序员跨平台写代码，痛苦异常。这个给我们编程带来极大方便的虚拟机就是大名鼎鼎的JVM(Java Virtual Machine)。既然是虚拟机那么就需要模拟真正物理机的所有设备，像CPU，网络，存储等。和我们程序员最密切的就是JVM的存储部分，这就是java内存模型(Java Memory Model 简称JMM)。有别于我们真实的物理存储模型，JMM把存储分为线程栈区和堆区（当然还有元空间等，不过和本系列文章没太大关系）。堆区对于java中的线程是共享资源，栈区是每个线程自己私有的，java对象主要是存储在堆区的，所有java线程都可以操作和获得堆区中的java对象。</p>
+<p>因为java内存模型是在具体的物理内存模型的基础上实现的，并且为了运行效率，java也支持指令重排序。所以java并发编程要想保证正确性也要处理好“原子性”、“有序性”、“可见性”三个问题。但是，我们的JMM也不是白吃干饭什么也做的，最起码运行在JVM上的代码就具备一些内存特性，来使得java代码有一定的“有序性”和“可见性”，这些特性也被称为 <strong>happen-before原则</strong>。下面先列举几个重要的内存特性。<br>JMM的 happen-before 特性：</p>
+<ul>
+<li>单线程happen-before原则：在同一个线程中，书写在前面的操作happen-before后面的操作。</li>
+<li>锁的happen-before原则：<strong>同一个锁</strong>的unlock操作happen-before此锁的lock操作。</li>
+<li>volatile的happen-before原则：对一个volatile变量的写操作happen-before对此变量的读操作。</li>
+<li>happen-before的传递性原则：如果A操作 happen-before B操作，B操作happen-before C操作，那么A操作happen-before B操作。</li>
+</ul>
+<p>这里不懂这些“happen-before”原则没关系，后面的文章会慢慢解释这些原则，以及他们在java.util.concurrent包中的类中的使用。先讲明白java并发编程的原理再结合源码分析这些原理的应用，是本系列文章的一大特色。</p>
+<h1 id="2-java语言对并发编程的支持"><a href="#2-java语言对并发编程的支持" class="headerlink" title="2 java语言对并发编程的支持"></a>2 java语言对并发编程的支持</h1><p>除了平时开发接触不到的java内存模型的happen-before原则外，java从语言层面也给我们一些关键字和类来帮助我们克服java并发编程中的“原子性”、“有序性”、“可见性”三个难题，让我们编写的多线程程序最起码是正确的。下面先简单介绍一些明星级别的帮手：</p>
+<ol>
+<li><p>锁。任何一个java开发者或者说任何一个开发人员没有没听说过“锁”的大名的，因为其使用简单且能“一锁治三性”而被大家广泛使用：把一段代码加上锁，就可以保证加锁代码在多线程环境下的“原子性”、“有序性”、“正确性”。但是正因为简单也导致锁被滥用，感觉一段代码可能有线程安全问题就无脑上锁导致程序虽然保证了“正确性”，但是“可行性”和“高效性”却出现问题。后面栗子会深入分析锁的优势和劣势。</p>
+</li>
+<li><p>volatile关键字。volatile关键字的使用是java并发编程不可或缺的性能优化手段，其能保证“可见性”和一定程度的“有序性”且开销没有锁那么大。在java.util.concurrent包它经常和它的好基友CAS一起实现一些高性能的线程安全的类。但是对它的使用需要深刻掌握它的原理，否则稍有不慎就可能弄巧成拙：不仅仅程序的性能没优化好，连程序的“正确性”都给“优化”没了。栗子后面会专门和大家一起驯化它。</p>
+</li>
+<li><p>final关键字。 final关键字在实现java并发编程的“正确性”上可能没有上面的两位老哥出名，开发者对其的了解更多的是javaSE语法的学习：修饰在类上保证类不能被继承、修饰在方法上让方法不能被重写（override）等等。但它在保证java并发编程的正确性上有独特的作用。后面栗子会慢慢揭开它不为人知的另一面。</p>
+</li>
+</ol>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 lmyuanwork@163.com </span>
     </div>
@@ -416,12 +448,12 @@
 
 
 <div class="article_copyright">
-    <p><span class="copy-title">文章标题:</span>00开篇</p>
+    <p><span class="copy-title">文章标题:</span>02 java内存模型和java语言帮手</p>
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
-    <p><span class="copy-title">发布时间:</span>2019-11-09, 16:36:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-01-30, 17:04:16</p>
-    <span class="copy-title">原始链接:</span><a class="post-url" href="/2019/11/09/java/jvm/post0/post0/" title="00开篇">http://aworker.cn/2019/11/09/java/jvm/post0/post0/</a>
+    <p><span class="copy-title">发布时间:</span>2020-05-20, 20:06:13</p>
+    <p><span class="copy-title">最后更新:</span>2020-06-05, 09:49:26</p>
+    <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/05/20/java/concurrency/post2/jvm_memory_model/" title="02 java内存模型和java语言帮手">http://aworker.cn/2020/05/20/java/concurrency/post2/jvm_memory_model/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
     </p>

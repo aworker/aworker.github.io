@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>00开篇 | 每天进步点</title>
+  <title>03 构建线程安全的类：安全发布一个类 | 每天进步点</title>
   <meta name="keywords" content="">
-  <meta name="description" content="00开篇 | 每天进步点">
+  <meta name="description" content="03 构建线程安全的类：安全发布一个类 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="听，寂寞在唱歌">
 <meta property="og:type" content="website">
@@ -317,9 +317,9 @@
 </aside>
 <div class="post">
     <div class="pjax">
-        <article id="post-java/jvm/post0/post0" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-java/concurrency/post3/construct_thread_safe_class" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">00开篇</h1>
+        <h1 class="article-title">03 构建线程安全的类：安全发布一个类</h1>
     
     <div class="article-meta">
         
@@ -327,9 +327,9 @@
         
         <span class="book">
             
-                <a href="javascript:" target="_blank" data-rel="jvm noopener">jvm</a>/
+                <a href="javascript:" target="_blank" data-rel="java并发 noopener">java并发</a>/
             
-                <a href="javascript:" target="_blank" data-rel="java虚拟机，说点不一样的 noopener">java虚拟机，说点不一样的</a>
+                <a href="javascript:" target="_blank" data-rel="java并发原理及实践 noopener">java并发原理及实践</a>
             
         </span>
         
@@ -337,7 +337,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-01-30 17:04:16'>2019-11-09 16:36</time>
+        创建时间:<time class="date" title='更新时间: 2020-06-07 10:50:33'>2020-05-20 20:06</time>
         
     </div>
     <div class="article-meta">
@@ -386,24 +386,47 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>有别于C/C++语言，java虚拟机解放了java程序员，使我们在开发过程中不必负责每个对象的出生和死亡，我们只管用new关键字创建对象，使用对象，对于不在使用的对象所占的内存空间的回收，完全交给java虚拟机来负责。在程序内存管理领域，java虚拟机即让我们避免成为分配对象内存，回收对象内存这样单调工作的奴隶；也让我们丧失了成为掌握对象内存空间管理“生杀大权”的皇帝，内存管理对我们越发的陌生和透明，一旦有内存泄露或者溢出以及涉及到虚拟机方面的性能调优，都会让我们手足无措。《也谈java虚拟机，说点不一样的》系列文章，力求用简单，生动，具体的讲述风格讲解java虚拟机的运作机制，让广大java开发人员得以管窥一二，在实际工作中、在面试找工作时、在饭后和同事吹逼时，都能得心应手，从容应对。鉴于java虚拟机知识体系的庞杂和深邃以及本员能力的限制，系列文章中难免有错误和不足，希望大家多多包涵。</p>
-<p>java虚拟机是一个抽象的计算机。对于程序开发人员来说，我们只需要编写好我们的程序，让不同平台上的java虚拟机完成java代码到不同操作系统计算机指令的转化，通过这种方式java语言实现了其夸平台特性。虽然名为java虚拟机，但是它并不是和java语言强绑定的，java虚拟机只能识别有特定语法格式的class文件，而所有能编译为class文件的语言，都可以在java虚拟机上运行，java虚拟机不是“java语言的虚拟机”而是“多语言的虚拟机”。</p>
-<p>在java虚拟机的发展历史上，曾经有很多的优秀的虚拟机实现。如随着jdk1.0一起发布的Classic VM，号称速度最快的JRockit VM，以及专精Windows平台的Microsoft JVM等。但我们普通程序员用的最多的也是“血统最纯正”虚拟机实现就是Sun公司发布的HotSpot VM，这个系列也以HotSpot虚拟机为蓝本进行讲述的。</p>
-<p>HotSpot虚拟机的组件结构如下：</p>
-<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg" alt="HotSpot虚拟机组件结构"> </p>
-<p>HotSpot虚拟机有三大主要模块：</p>
-<ul>
-<li>类加载子系统，主要用来加载class文件，从中获取类信息。</li>
-<li>虚拟机运行时数据区，主要存储程序运行时的各种对象信息和线程栈帧数据。</li>
-<li>执行引擎，主要内存垃圾回收和运行时代码优化。</li>
-</ul>
-<p>本系列将会从实际应用、面试需要、饭后吹逼等三个角度分别讲解这三大主要模块。同时给自己立个flag到2020年6月能完成本系列文章的全部写作。</p>
+        <!-- 正确性问题 -->
+
+<p>编写多线程的java程序时，我们最最基础的要求是保证程序的正确性：多线程环境下程序能够获得正确的执行结果。而保证程序在多线程环境的正确性离不开构成java程序的类在多线程环境下的正确性，也就是我们说的<strong>线程安全</strong>。那么什么样的类是线程安全的呢？</p>
 <blockquote>
-<p>有任何不懂或者质疑的地方，都欢迎大家积极留言讨论，留言必回，一起学习进步。</p>
+<p>线程安全的类在被多个线程访问执行时能保持设计者想要的行为，这种正确的行为的保持不需要借助此类以外的其它手段的帮助。</p>
 </blockquote>
-<!-- 
-参考文献 https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
--->
+<p>这里有三个要点，类必须是被多个线程调用、类能保持设计者想要的行为、这种行为的保持不需要别的辅助手段来完成，说起来挺抽象的，栗子给大家举个例子，比如有如下类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/</span><br><span class="line">/**</span><br><span class="line"> *  ThreadAlarm类用来统计线程调用次数</span><br><span class="line"> */</span><br><span class="line">public class ThreadAlarm &#123;</span><br><span class="line">    private int quota;</span><br><span class="line"></span><br><span class="line">    public ThreadAlarm(int quota)&#123;</span><br><span class="line">        this.quota = quota;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void invokeByPerThread()&#123;</span><br><span class="line">        quota--;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public int getRemained()&#123;</span><br><span class="line">        return quota;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果ThreadAlarm类是线程安全的，那么它需要保证多个线程调用它的invokeByPerThread方法时（被多个线程访问执行）quota能正确减少相应的数值（保持设计者要求的行为），同时线程在调用invokeByPerThread方法前不用加锁或者其他方式来保证行为的正确性（不需要借助此类以外的其它手段的帮助）。按照这个要求来说，ThreadAlarm类并不是一个线程安全的类。</p>
+<p>考虑如下对ThreadAlarm类的一种使用情况，main方法中定义一个配额为10000的ThreadAlarm对象，同时创建10000个线程分别获取一个配额，然后循环判断threadAlarm对象剩余的配额是否为0，为0就抛出一个运行时异常。如果ThreadAlarm类是线程安全的，那么main方法中一定会抛出一个RuntimeException，但是大家可以运行下这个程序，不需要尝试太多次，很有可能会出现main方法执行死循环，不抛异常的情况。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class Main&#123;</span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        ThreadAlarm threadAlarm = new ThreadAlarm(10000);  //1</span><br><span class="line">        System.out.println(threadAlarm.getRemained()); //2</span><br><span class="line">        for(int i=0; i&lt;10000; i++)&#123;   </span><br><span class="line">            new Thread(() -&gt; threadAlarm.invokeByPerThread()).start();  //3</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        for (;;) &#123;</span><br><span class="line">            if (threadAlarm.getRemained() == 0) &#123;</span><br><span class="line">                throw new RuntimeException(&quot;达到配额了&quot;);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为什么ThreadAlarm类不是一个线程安全的类呢？这里栗子带大家先看下 //1 处的代码，在main线程执行创建TheadAlarm类时实际上是执行了如下三个步骤：</p>
+<ol>
+<li>创建一个ThreadAlarm对象</li>
+<li>把ThreadAlarm对象的quota变量赋值为10000</li>
+<li>把ThreadAlarm对象赋值给一个对象引用（本例中是threadAlarm）</li>
+</ol>
+<!-- todo exchange url-->
+<p>前面的文章说过，多线程的正确性问题主要是因为操作的原子性，操作的有序性，和操作的可见性没能得到保证导致的。这里在main线程中执行创建ThreadAlarm对象的三个步骤的顺序很有可能是有变化的，比如按照 1. 3. 2.的顺序执行，前文<!-- todo exchange url --> 也说过，操作系统、java虚拟机、java编译器不会无脑改变程序的执行顺序，最起码在main线程中这种改变是不会影响 //2 处代码的打印结果：不管怎么指令重排序，打印的数字永远为10000。但是对于 //3 处创建并执行的线程来说，其通过threadAlarm对象的invokeByPerThread方法看到的quota变量很有可能是quota变量的默认值:0。这里引出一个重要的概念：</p>
+<blockquote>
+<p>在某个线程中创建的对象其引用对其它线程可见时，并不意味着此对象中的成员变量对其它线程也是可见的。</p>
+</blockquote>
+<p>那么如何才能保证对象和其成员变量对其它线程的可见性呢？这里可以用我们的final关键字了。如下例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">public class Person&#123;</span><br><span class="line">    public  int age;</span><br><span class="line">    public final String name;</span><br><span class="line"></span><br><span class="line">    public Person(int age,String name)&#123;</span><br><span class="line">        this.age = age;</span><br><span class="line">        this.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args)&#123;</span><br><span class="line">        Person person = new Person(18,&quot;栗子&quot;);</span><br><span class="line">        new Thread(() -&gt; System.out.println(person.name +&quot;:&quot;+person.age ),&quot;reader&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于这个程序来说，//1 处的线程reader一定可以看到person.name的值:“栗子”，但是不一定能看到person.age的值:18。final关键字可以保证其它线程（非对象的创建线程）在能看到某个对象（此对象的索引不为null）时，那么这个线程也能看到此对象用final关键字修饰的成员变量的初始化值。除此以外，其它线程也能看到通过final关键字修饰的变量获取的其它对象的正确初始化值，举个栗子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public class OuterClassV1 &#123;</span><br><span class="line">    private final InnerClass innerClass;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private static class InnerClass&#123;</span><br><span class="line">        private int state;</span><br><span class="line"></span><br><span class="line">        public InnerClass(int state) &#123;</span><br><span class="line">            this.state = state;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public OuterClassV1() &#123;</span><br><span class="line"></span><br><span class="line">        innerClass = new InnerClass(3);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public  int getState()&#123;</span><br><span class="line">        return innerClass.state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">//    public void setState(int newState)&#123;</span><br><span class="line">//        innerClass.state = newState;</span><br><span class="line">//    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        OuterClassV1 outerClass = new OuterClassV1();</span><br><span class="line">        </span><br><span class="line">//        outerClass.setState(33);</span><br><span class="line">        new Thread(() -&gt; System.out.println(outerClass.getState()),&quot;reader&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码比较简单，main线程创建一个OuterClassV1对象，同时对InnerClass对象的state变量赋值为3，reader线程一定能正确获取到InnerClass对象的state变量的值:打印结果一定是3，因为reader是通过final修饰的变量(innerClass)获取到state值的。</p>
+<p>不仅如此，我们的OuterClassV1类还是线程安全的类，它能保持线程安全是因为它是一个不可变的类：</p>
+<ol>
+<li>变量必须都用final关键字修饰。</li>
+<li>变量所在的对象在构造完成前不能暴露给其它线程。</li>
+<li>通过final变量获取到的值在变量所在的对象构造完成后，不能再发生改变。</li>
+</ol>
+<p>用OutterClassV1来解释，其innerClass变量被final关键字修饰满足 1. ；在OuterClassV1的构造方法中OuterClassV1的对象（this）没有暴露给别的线程满足 2. ；OuterClassV1对象构造完后innerClass变量被final修饰不可能变化且没有方法可以再修改其state的值，OutterClassV1对象创建完成后，其满足 3. 。</p>
+<p>简单的逻辑理解就是final关键字保证了innerClass变量和state变量对别的线程的可见性，同时这两个变量被发布后不能再被改变，那么当然是线程安全的了。</p>
+<blockquote>
+<p>不可变类永远都是线程安全的。</p>
+</blockquote>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 lmyuanwork@163.com </span>
     </div>
@@ -416,12 +439,12 @@
 
 
 <div class="article_copyright">
-    <p><span class="copy-title">文章标题:</span>00开篇</p>
+    <p><span class="copy-title">文章标题:</span>03 构建线程安全的类：安全发布一个类</p>
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
-    <p><span class="copy-title">发布时间:</span>2019-11-09, 16:36:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-01-30, 17:04:16</p>
-    <span class="copy-title">原始链接:</span><a class="post-url" href="/2019/11/09/java/jvm/post0/post0/" title="00开篇">http://aworker.cn/2019/11/09/java/jvm/post0/post0/</a>
+    <p><span class="copy-title">发布时间:</span>2020-05-20, 20:06:13</p>
+    <p><span class="copy-title">最后更新:</span>2020-06-07, 10:50:33</p>
+    <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/05/20/java/concurrency/post3/construct_thread_safe_class/" title="03 构建线程安全的类：安全发布一个类">http://aworker.cn/2020/05/20/java/concurrency/post3/construct_thread_safe_class/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
     </p>

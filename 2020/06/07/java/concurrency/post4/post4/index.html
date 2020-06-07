@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>00开篇 | 每天进步点</title>
+  <title>04 构建线程安全的类：安全发布一个类 | 每天进步点</title>
   <meta name="keywords" content="">
-  <meta name="description" content="00开篇 | 每天进步点">
+  <meta name="description" content="04 构建线程安全的类：安全发布一个类 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="听，寂寞在唱歌">
 <meta property="og:type" content="website">
@@ -317,9 +317,9 @@
 </aside>
 <div class="post">
     <div class="pjax">
-        <article id="post-java/jvm/post0/post0" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-java/concurrency/post4/post4" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">00开篇</h1>
+        <h1 class="article-title">04 构建线程安全的类：安全发布一个类</h1>
     
     <div class="article-meta">
         
@@ -327,9 +327,9 @@
         
         <span class="book">
             
-                <a href="javascript:" target="_blank" data-rel="jvm noopener">jvm</a>/
+                <a href="javascript:" target="_blank" data-rel="java并发 noopener">java并发</a>/
             
-                <a href="javascript:" target="_blank" data-rel="java虚拟机，说点不一样的 noopener">java虚拟机，说点不一样的</a>
+                <a href="javascript:" target="_blank" data-rel="java并发原理及实践 noopener">java并发原理及实践</a>
             
         </span>
         
@@ -337,7 +337,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-01-30 17:04:16'>2019-11-09 16:36</time>
+        创建时间:<time class="date" title='更新时间: 2020-06-07 10:50:43'>2020-06-07 10:26</time>
         
     </div>
     <div class="article-meta">
@@ -386,24 +386,16 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>有别于C/C++语言，java虚拟机解放了java程序员，使我们在开发过程中不必负责每个对象的出生和死亡，我们只管用new关键字创建对象，使用对象，对于不在使用的对象所占的内存空间的回收，完全交给java虚拟机来负责。在程序内存管理领域，java虚拟机即让我们避免成为分配对象内存，回收对象内存这样单调工作的奴隶；也让我们丧失了成为掌握对象内存空间管理“生杀大权”的皇帝，内存管理对我们越发的陌生和透明，一旦有内存泄露或者溢出以及涉及到虚拟机方面的性能调优，都会让我们手足无措。《也谈java虚拟机，说点不一样的》系列文章，力求用简单，生动，具体的讲述风格讲解java虚拟机的运作机制，让广大java开发人员得以管窥一二，在实际工作中、在面试找工作时、在饭后和同事吹逼时，都能得心应手，从容应对。鉴于java虚拟机知识体系的庞杂和深邃以及本员能力的限制，系列文章中难免有错误和不足，希望大家多多包涵。</p>
-<p>java虚拟机是一个抽象的计算机。对于程序开发人员来说，我们只需要编写好我们的程序，让不同平台上的java虚拟机完成java代码到不同操作系统计算机指令的转化，通过这种方式java语言实现了其夸平台特性。虽然名为java虚拟机，但是它并不是和java语言强绑定的，java虚拟机只能识别有特定语法格式的class文件，而所有能编译为class文件的语言，都可以在java虚拟机上运行，java虚拟机不是“java语言的虚拟机”而是“多语言的虚拟机”。</p>
-<p>在java虚拟机的发展历史上，曾经有很多的优秀的虚拟机实现。如随着jdk1.0一起发布的Classic VM，号称速度最快的JRockit VM，以及专精Windows平台的Microsoft JVM等。但我们普通程序员用的最多的也是“血统最纯正”虚拟机实现就是Sun公司发布的HotSpot VM，这个系列也以HotSpot虚拟机为蓝本进行讲述的。</p>
-<p>HotSpot虚拟机的组件结构如下：</p>
-<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg" alt="HotSpot虚拟机组件结构"> </p>
-<p>HotSpot虚拟机有三大主要模块：</p>
-<ul>
-<li>类加载子系统，主要用来加载class文件，从中获取类信息。</li>
-<li>虚拟机运行时数据区，主要存储程序运行时的各种对象信息和线程栈帧数据。</li>
-<li>执行引擎，主要内存垃圾回收和运行时代码优化。</li>
-</ul>
-<p>本系列将会从实际应用、面试需要、饭后吹逼等三个角度分别讲解这三大主要模块。同时给自己立个flag到2020年6月能完成本系列文章的全部写作。</p>
+        <p>但是我们创建的对象变量不是一成不变的，其可能需要改变初始值，如果将OuterClassV1类中被注释的代码放开，那么reader线程可能获取不到main线程对state变量赋的新值33，因为它破坏了final变量保持可见性的条件 3. 。那么有没有办法让我们可以在对象创建完后修改变量的值，同时保持可见性呢？这里就可以用我们的volatile关键字了:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public class OuterClassV2 &#123;</span><br><span class="line">    private final InnerClass innerClass;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private static class InnerClass&#123;</span><br><span class="line">        private volatile int state;</span><br><span class="line"></span><br><span class="line">        public InnerClass(int state) &#123;</span><br><span class="line">            this.state = state;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public OuterClassV2() &#123;</span><br><span class="line"></span><br><span class="line">        innerClass = new InnerClass(3);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public  int getState()&#123;</span><br><span class="line">        return innerClass.state;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public void setState(int newState)&#123;</span><br><span class="line">        innerClass.state = newState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        OuterClassV2 outerClass = new OuterClassV2();</span><br><span class="line"></span><br><span class="line">        outerClass.setState(33);</span><br><span class="line">        new Thread(() -&gt; System.out.println(outerClass.getState()),&quot;reader&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>OuterClassV2和OuterClassV1的区别是V2的InnerClass的state变量被定义为volatile的了，<!--todo -->前文我们已经介绍了，volatile关键字修饰的变量满足happen-before原则：main线程volatile变量state的写操作结果33，对reader线程的volatile变量state的读操作一定是可见的，即reader线程的打印结果一定是33。使用volatile关键字一定要谨慎。<br>先做个总结</p>
 <blockquote>
-<p>有任何不懂或者质疑的地方，都欢迎大家积极留言讨论，留言必回，一起学习进步。</p>
+<p>final关键字修饰的变量在其对象的构造方法中没有暴露给其它线程且在对象发布后通过此变量获取的值都不在变化，那么其它通过final变量获取的值满足可见性。</p>
 </blockquote>
-<!-- 
-参考文献 https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
--->
+<blockquote>
+<p>volatile关键字修饰的变量值发生变化</p>
+</blockquote>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 lmyuanwork@163.com </span>
     </div>
@@ -416,12 +408,12 @@
 
 
 <div class="article_copyright">
-    <p><span class="copy-title">文章标题:</span>00开篇</p>
+    <p><span class="copy-title">文章标题:</span>04 构建线程安全的类：安全发布一个类</p>
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
-    <p><span class="copy-title">发布时间:</span>2019-11-09, 16:36:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-01-30, 17:04:16</p>
-    <span class="copy-title">原始链接:</span><a class="post-url" href="/2019/11/09/java/jvm/post0/post0/" title="00开篇">http://aworker.cn/2019/11/09/java/jvm/post0/post0/</a>
+    <p><span class="copy-title">发布时间:</span>2020-06-07, 10:26:30</p>
+    <p><span class="copy-title">最后更新:</span>2020-06-07, 10:50:43</p>
+    <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/06/07/java/concurrency/post4/post4/" title="04 构建线程安全的类：安全发布一个类">http://aworker.cn/2020/06/07/java/concurrency/post4/post4/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
     </p>

@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>00开篇 | 每天进步点</title>
+  <title>绑架游戏 | 每天进步点</title>
   <meta name="keywords" content="">
-  <meta name="description" content="00开篇 | 每天进步点">
+  <meta name="description" content="绑架游戏 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="听，寂寞在唱歌">
 <meta property="og:type" content="website">
@@ -317,9 +317,9 @@
 </aside>
 <div class="post">
     <div class="pjax">
-        <article id="post-java/jvm/post0/post0" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-java/book/kidnap_game" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">00开篇</h1>
+        <h1 class="article-title">绑架游戏</h1>
     
     <div class="article-meta">
         
@@ -327,9 +327,7 @@
         
         <span class="book">
             
-                <a href="javascript:" target="_blank" data-rel="jvm noopener">jvm</a>/
-            
-                <a href="javascript:" target="_blank" data-rel="java虚拟机，说点不一样的 noopener">java虚拟机，说点不一样的</a>
+                <a href="javascript:" target="_blank" data-rel="book noopener">book</a>
             
         </span>
         
@@ -337,7 +335,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-01-30 17:04:16'>2019-11-09 16:36</time>
+        创建时间:<time class="date" title='更新时间: 2020-01-31 16:19:08'>2020-01-30 17:36</time>
         
     </div>
     <div class="article-meta">
@@ -386,24 +384,10 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>有别于C/C++语言，java虚拟机解放了java程序员，使我们在开发过程中不必负责每个对象的出生和死亡，我们只管用new关键字创建对象，使用对象，对于不在使用的对象所占的内存空间的回收，完全交给java虚拟机来负责。在程序内存管理领域，java虚拟机即让我们避免成为分配对象内存，回收对象内存这样单调工作的奴隶；也让我们丧失了成为掌握对象内存空间管理“生杀大权”的皇帝，内存管理对我们越发的陌生和透明，一旦有内存泄露或者溢出以及涉及到虚拟机方面的性能调优，都会让我们手足无措。《也谈java虚拟机，说点不一样的》系列文章，力求用简单，生动，具体的讲述风格讲解java虚拟机的运作机制，让广大java开发人员得以管窥一二，在实际工作中、在面试找工作时、在饭后和同事吹逼时，都能得心应手，从容应对。鉴于java虚拟机知识体系的庞杂和深邃以及本员能力的限制，系列文章中难免有错误和不足，希望大家多多包涵。</p>
-<p>java虚拟机是一个抽象的计算机。对于程序开发人员来说，我们只需要编写好我们的程序，让不同平台上的java虚拟机完成java代码到不同操作系统计算机指令的转化，通过这种方式java语言实现了其夸平台特性。虽然名为java虚拟机，但是它并不是和java语言强绑定的，java虚拟机只能识别有特定语法格式的class文件，而所有能编译为class文件的语言，都可以在java虚拟机上运行，java虚拟机不是“java语言的虚拟机”而是“多语言的虚拟机”。</p>
-<p>在java虚拟机的发展历史上，曾经有很多的优秀的虚拟机实现。如随着jdk1.0一起发布的Classic VM，号称速度最快的JRockit VM，以及专精Windows平台的Microsoft JVM等。但我们普通程序员用的最多的也是“血统最纯正”虚拟机实现就是Sun公司发布的HotSpot VM，这个系列也以HotSpot虚拟机为蓝本进行讲述的。</p>
-<p>HotSpot虚拟机的组件结构如下：</p>
-<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg" alt="HotSpot虚拟机组件结构"> </p>
-<p>HotSpot虚拟机有三大主要模块：</p>
-<ul>
-<li>类加载子系统，主要用来加载class文件，从中获取类信息。</li>
-<li>虚拟机运行时数据区，主要存储程序运行时的各种对象信息和线程栈帧数据。</li>
-<li>执行引擎，主要内存垃圾回收和运行时代码优化。</li>
-</ul>
-<p>本系列将会从实际应用、面试需要、饭后吹逼等三个角度分别讲解这三大主要模块。同时给自己立个flag到2020年6月能完成本系列文章的全部写作。</p>
-<blockquote>
-<p>有任何不懂或者质疑的地方，都欢迎大家积极留言讨论，留言必回，一起学习进步。</p>
-</blockquote>
-<!-- 
-参考文献 https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
--->
+        <p>《绑架游戏》是我读的东野圭吾的第一篇小说，在这之前我是很少有看小说的爱好的。印象中最早接触的小说是自己在上小学亦或是初中的时候读的一本叫《说岳飞通俗演义》的书，当时家里的住房翻新借宿在自己的一个叔叔家里，刚好叔叔家里有这本小说，因为住的地方发生了变化，和儿时的伙伴接触的机会不是太多了，加上当时比物质生活更加贫瘠的精神生活，导致自己放学，放假后没有什么娱乐活动。这让自己在折磨完地里的蚂蚁和蟋蟀后，开始在饭后有机会看这本书。自己本来就比较喜欢历史类的书籍，所以很快就把这本书读完了。再后来接触到小说就是在上高中的时候，我的同位特别喜欢小说，印象中常常在上自习时，或者上课时他抱着一本砖头厚（参考《think in java》）的大书看，偶尔在课间他也会和我聊小说中的内容，我也在那个时候了解到《星辰变》、《神墓》、《小兵传奇》这类玄幻类小说，加上高中时候都是一些学习上不太上进的学生看小说，小说给我的印象就不太好，这种印象从高中持续到大学，研究生（研究生阶段我读完了 路遥的《平凡的世界》），和工作以后，直到2020年1月份的某个一天，在通往火车站的地铁上，我无意间在阅读app扫到这本《绑架游戏》。早在2018年就曾听过东野圭吾，当时有个同事非常喜欢他的作品，然后简单百度了下知道其是日本的一位比较有名的推理小说作家。然而真正让我感兴趣并且开始有意读其作品，就始于这部《绑架游戏》。</p>
+<p>《绑架游戏》介绍的是一位叫佐久间俊介的广告公司资深策划，在其策划案被甲方的副社长葛城胜俊否定后，心意阑珊之下去葛城府邸溜达时而引发的一场“绑架游戏”。俊介和葛城家的千金葛城树理演义一场被绑架人和绑架人一起谋划的绑架游戏，俊介通过细致的计算和高超的演技成功的报复了葛城胜俊——赢得了赎金且全身而退。但在随后的日子里发现真相可能并不是想他想的那样简单：情妇生养的葛城树理因为琐事和正妻生养的葛城千春发生口角而离家出走，俊介恰巧偶遇逃跑的树理，树理因为在家受尽歧视想报复葛城家，和恰好想报复葛城胜俊的俊介不谋而合，于是二人导演了这出绑架游戏。真相是出逃的并不是葛城树理，而是冒名葛城树理的葛城千春，而千春出逃的真实原因是自己因为琐事意外杀害了葛城树理，俊介以为自己是这出绑架大戏的导演，没想到自己只不过是千春和胜俊为掩盖千春杀人真相的一个棋子。在绑架游戏的过程中有好多意外和可疑事情发生，但都因为俊介的盲目自信与好强而没有及时收手，来终结这场游戏。当然如果仅仅是这样，这顶多会是一场被警察识破的恶作剧，但是俊介在绑架过程中爱上了千春导致了致命性的结果——俊介被千春和胜俊有意刻画成一个索要赎金得逞后还强奸并杀害树理的凶手。但也正是因为自己爱上了千春后无意拍摄的一张照片让自己和葛城家保持着一种动态平衡，自己才免于遭人杀害…</p>
+<p>目前阅读过东野圭吾两部作品，其写作风格都是前期平淡无奇的叙述和后期真相的急剧翻转，作者通过前期看似无意的“无心插柳”般的伏笔到后期的“串线成林”让人不禁惊叹于作者精细秒的构思和强大的文字功力，希望2020年能有时间阅读其大作《白夜行》。武汉加油！天佑中华！</p>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 lmyuanwork@163.com </span>
     </div>
@@ -416,12 +400,12 @@
 
 
 <div class="article_copyright">
-    <p><span class="copy-title">文章标题:</span>00开篇</p>
+    <p><span class="copy-title">文章标题:</span>绑架游戏</p>
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
-    <p><span class="copy-title">发布时间:</span>2019-11-09, 16:36:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-01-30, 17:04:16</p>
-    <span class="copy-title">原始链接:</span><a class="post-url" href="/2019/11/09/java/jvm/post0/post0/" title="00开篇">http://aworker.cn/2019/11/09/java/jvm/post0/post0/</a>
+    <p><span class="copy-title">发布时间:</span>2020-01-30, 17:36:13</p>
+    <p><span class="copy-title">最后更新:</span>2020-01-31, 16:19:08</p>
+    <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/01/30/java/book/kidnap_game/" title="绑架游戏">http://aworker.cn/2020/01/30/java/book/kidnap_game/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
     </p>

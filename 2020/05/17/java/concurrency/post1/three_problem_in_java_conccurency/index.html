@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>00开篇 | 每天进步点</title>
+  <title>01 java并发编程要解决的三大问题 | 每天进步点</title>
   <meta name="keywords" content="">
-  <meta name="description" content="00开篇 | 每天进步点">
+  <meta name="description" content="01 java并发编程要解决的三大问题 | 每天进步点">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="description" content="听，寂寞在唱歌">
 <meta property="og:type" content="website">
@@ -317,9 +317,9 @@
 </aside>
 <div class="post">
     <div class="pjax">
-        <article id="post-java/jvm/post0/post0" class="article article-type-post" itemscope itemprop="blogPost">
+        <article id="post-java/concurrency/post1/three_problem_in_java_conccurency" class="article article-type-post" itemscope itemprop="blogPost">
     
-        <h1 class="article-title">00开篇</h1>
+        <h1 class="article-title">01 java并发编程要解决的三大问题</h1>
     
     <div class="article-meta">
         
@@ -327,9 +327,9 @@
         
         <span class="book">
             
-                <a href="javascript:" target="_blank" data-rel="jvm noopener">jvm</a>/
+                <a href="javascript:" target="_blank" data-rel="java并发 noopener">java并发</a>/
             
-                <a href="javascript:" target="_blank" data-rel="java虚拟机，说点不一样的 noopener">java虚拟机，说点不一样的</a>
+                <a href="javascript:" target="_blank" data-rel="java并发原理及实践 noopener">java并发原理及实践</a>
             
         </span>
         
@@ -337,7 +337,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-01-30 17:04:16'>2019-11-09 16:36</time>
+        创建时间:<time class="date" title='更新时间: 2020-05-22 23:10:34'>2020-05-17 13:28</time>
         
     </div>
     <div class="article-meta">
@@ -370,7 +370,7 @@
     
     <div class="toc-ref">
     
-        
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-并发简史"><span class="toc-text">1 并发简史</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-java中的并发编程"><span class="toc-text">2 java中的并发编程</span></a></li></ol>
     
 <style>
     .left-col .switch-btn,
@@ -386,24 +386,28 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>有别于C/C++语言，java虚拟机解放了java程序员，使我们在开发过程中不必负责每个对象的出生和死亡，我们只管用new关键字创建对象，使用对象，对于不在使用的对象所占的内存空间的回收，完全交给java虚拟机来负责。在程序内存管理领域，java虚拟机即让我们避免成为分配对象内存，回收对象内存这样单调工作的奴隶；也让我们丧失了成为掌握对象内存空间管理“生杀大权”的皇帝，内存管理对我们越发的陌生和透明，一旦有内存泄露或者溢出以及涉及到虚拟机方面的性能调优，都会让我们手足无措。《也谈java虚拟机，说点不一样的》系列文章，力求用简单，生动，具体的讲述风格讲解java虚拟机的运作机制，让广大java开发人员得以管窥一二，在实际工作中、在面试找工作时、在饭后和同事吹逼时，都能得心应手，从容应对。鉴于java虚拟机知识体系的庞杂和深邃以及本员能力的限制，系列文章中难免有错误和不足，希望大家多多包涵。</p>
-<p>java虚拟机是一个抽象的计算机。对于程序开发人员来说，我们只需要编写好我们的程序，让不同平台上的java虚拟机完成java代码到不同操作系统计算机指令的转化，通过这种方式java语言实现了其夸平台特性。虽然名为java虚拟机，但是它并不是和java语言强绑定的，java虚拟机只能识别有特定语法格式的class文件，而所有能编译为class文件的语言，都可以在java虚拟机上运行，java虚拟机不是“java语言的虚拟机”而是“多语言的虚拟机”。</p>
-<p>在java虚拟机的发展历史上，曾经有很多的优秀的虚拟机实现。如随着jdk1.0一起发布的Classic VM，号称速度最快的JRockit VM，以及专精Windows平台的Microsoft JVM等。但我们普通程序员用的最多的也是“血统最纯正”虚拟机实现就是Sun公司发布的HotSpot VM，这个系列也以HotSpot虚拟机为蓝本进行讲述的。</p>
-<p>HotSpot虚拟机的组件结构如下：</p>
-<p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/jvm/post0/HotSpot-architecture.jpg" alt="HotSpot虚拟机组件结构"> </p>
-<p>HotSpot虚拟机有三大主要模块：</p>
+        <h1 id="1-并发简史"><a href="#1-并发简史" class="headerlink" title="1 并发简史"></a>1 并发简史</h1><p>在计算机发明早期，一台计算机在同一时间只能运行一个程序。如果将人比作一台计算机的话，就是一个人在同一时间内只能做一件事情不能三心二意。就拿博主我给老婆做最爱吃的皮蛋瘦肉粥来说，要经历洗米、把米放锅中煮、切肉和皮蛋、找准火候放入肉和皮蛋、电饭煲闷煮、电饭煲提示灯亮后给老婆大人盛饭，我们要按照顺序执行每一步，在得到结果后再执行下一步，最后得到最终的结果。同样对于早期的计算机来说，交给它一个任务如计算1+2的结果并打印，其要先分别拿到1和2放到寄存器中、然后执行加法运算得出结果3、然后把3回写到内存中、最后把结果通过打印机输出到纸上。大略一看，这个观点似乎没什么问题，但是效率上其实还可以提升下，不管是在人做饭还是计算机执行算数任务这件事上。</p>
+<p>不管是人还是机器，都需要提高自身资源的使用效率。人在做饭时最主要使用的是眼睛、双手、和大脑，我们另外一个主要器官耳朵在做饭过程中的使用率并不是太高，这样我们就可以变做饭边听早间新闻提高我们自身器官的使用率，那么效率自然也就提升了。对于计算机来说道理也是相同，在计算机执行计算任务时主要使用的是CPU，在计算机回写计算结果时使用的主要是I/O设备，如果我们能让计算机在执行1+2任务的计算部分时，能让闲置的I/O设备忙起来搞其它任务的输入或者输出部分的工作；亦或在计算机通过I/O设备将1+2的计算结果打印到纸上时，让闲置的CPU来执行其它任务的计算部分。那么假设本来需要两个小时完成的类似1+2这种计算结果并打印的大量任务，现在提升效率后大体只需要一个小时就能完成了。</p>
+<p>人们为了提升计算机各种设备的使用效率，引入了操作系统来统一管理计算机中的各种设备。所有的任务只需要和操作系统打交道，由操作系统统一调度计算机中的各种设备，尽最大可能保证各种设备在同一时间没有被闲置。操作系统除了保证各种设备没有被闲置外，还要保证各种任务在使用计算机设备时尽可能的公平，当我们用计算机的CPU解码mp3文件听歌时，不能因要执行1+2的计算任务把CPU抢占过去后不能听歌曲了，操作系统会把任务对CPU的使用时间切成无数小的几毫秒的时间片段，每个任务交替的获取使用CPU的时间片段来保证各个任务在执行顺序上的公平。不同任务对CPU按照时间片来交替使用，这个叫做并发。</p>
+<h1 id="2-java中的并发编程"><a href="#2-java中的并发编程" class="headerlink" title="2 java中的并发编程"></a>2 java中的并发编程</h1><p>上节我们知道计算系统分配CPU时间片的最小单位是一个个具体的任务，操作系统提供线程的概念给各种各样的程序，程序把一个大任务按照不同的性质分隔成小任务，每个小任务被封装在一个线程中交给操作系统来调度执行。同一个程序中的线程有如下特点：</p>
 <ul>
-<li>类加载子系统，主要用来加载class文件，从中获取类信息。</li>
-<li>虚拟机运行时数据区，主要存储程序运行时的各种对象信息和线程栈帧数据。</li>
-<li>执行引擎，主要内存垃圾回收和运行时代码优化。</li>
+<li><p>资源共享，操作系统分配给程序的各种资源对于线程来说都是共享的，如内存，CPU等。</p>
+</li>
+<li><p>线程之间是交替执行的，一个程序中的线程一般是不会少于机器的CPU数量的，这势必导致同一时间点，并不是所有的程序线程都在运行。</p>
+</li>
 </ul>
-<p>本系列将会从实际应用、面试需要、饭后吹逼等三个角度分别讲解这三大主要模块。同时给自己立个flag到2020年6月能完成本系列文章的全部写作。</p>
-<blockquote>
-<p>有任何不懂或者质疑的地方，都欢迎大家积极留言讨论，留言必回，一起学习进步。</p>
-</blockquote>
-<!-- 
-参考文献 https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html
--->
+<p>java中的并发编程问题也就是对线程和线程能访问到的资源的管理问题，即怎样管理线程和资源才能让程序的执行效率更高同时不出差错。具体来说就是解决以下三大问题：</p>
+<ol>
+<li><p>正确性问题。由于线程可以共享程序中的各种资源，这有可能导致多个线程对同一个资源的竞争使用，使原来单线程顺序执行时正确的程序，在多线程下出现问题。</p>
+</li>
+<li><p>可行性问题。由于对锁的管理不当，导致发生死锁问题，而程序中的死锁可能导致程序“僵死”，没办法完成指定的任务。当然多线程的可行性问题不全是死锁导致的，还有线程饥饿，活锁等多种可能。</p>
+</li>
+<li><p>高效性问题。引入多线程后原本一个线程用来执行任务现在交给多个线程一起执行了，效率一定会更高吗？其实并不是绝对的，为了保证多线程程序的正确性和可行性，势必会引入管理成本，同时线程在切换时间片的时候也会有成本。如果平衡不好这些成本，多线程的引入可能带来的是效率的倒退。</p>
+</li>
+</ol>
+<p>这里栗子给大家举个例子,多线程程序就好比是一个交通系统，一辆汽车就好比是一个线程，其中的道路就好比是线程运行时所需要的各种公共资源。如果交通管理系统没能正确的调度其上运行的车辆，让南北行驶的汽车（线程1）和东西行驶的汽车（线程2）同时经过（操作）了交通路口（公共资源）而出了车祸（出现脏数据），这就是没解决好正确性问题；如果因为交通系统调度不合理导致很多车辆相互“顶牛”（A线程拿着B线程要用的资源1，B线程拿着A线程要用的资源2，大家都不释放），互不让路，这就会出现可行性问题；一个调度良好的交通系统能让车辆的吞吐率大幅度提升，这就是高效性问题。</p>
+<p>这三大问题正确性是基本，不管是不是并发编程，首先你要保证执行结果是正确的；其次是可行性，程序如果引入了java并发编程先不说效率能提升多少，最起码程序能够顺利执行完成；最后是高效性问题，在满足正确性和可行性时，我们希望我们的程序能在java并发的加持下，相较于单线程顺序执行的程序能更快地完成任务。栗子本系列文章就是围绕这三大问题展开的，而深入了解这三大问题，相信大家会对java多线程有一个更加深刻的认识。</p>
+
       
        <hr><span style="font-style: italic;color: gray;"> 转载请注明来源，欢迎对文章中的引用来源进行考证，欢迎指出任何有错误或不够清晰的表达。可以在下面评论区评论，也可以邮件至 lmyuanwork@163.com </span>
     </div>
@@ -416,12 +420,12 @@
 
 
 <div class="article_copyright">
-    <p><span class="copy-title">文章标题:</span>00开篇</p>
+    <p><span class="copy-title">文章标题:</span>01 java并发编程要解决的三大问题</p>
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
-    <p><span class="copy-title">发布时间:</span>2019-11-09, 16:36:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-01-30, 17:04:16</p>
-    <span class="copy-title">原始链接:</span><a class="post-url" href="/2019/11/09/java/jvm/post0/post0/" title="00开篇">http://aworker.cn/2019/11/09/java/jvm/post0/post0/</a>
+    <p><span class="copy-title">发布时间:</span>2020-05-17, 13:28:13</p>
+    <p><span class="copy-title">最后更新:</span>2020-05-22, 23:10:34</p>
+    <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/05/17/java/concurrency/post1/three_problem_in_java_conccurency/" title="01 java并发编程要解决的三大问题">http://aworker.cn/2020/05/17/java/concurrency/post1/three_problem_in_java_conccurency/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
     </p>
