@@ -95,7 +95,7 @@ register > 一级缓存 > 二级缓存 > ... > n级缓存 > 内存
 JMM的 happen-before 特性：
 * 单线程happen-before原则：在同一个线程中，书写在前面的操作happen-before后面的操作。
 * 锁的happen-before原则：**同一个锁**的unlock操作happen-before此锁的lock操作。
-* volatile的happen-before原则：对一个volatile变量的写操作happen-before对此变量的任意操作(当然也包括写操作了)。
+* volatile的happen-before原则：对一个volatile变量的写操作happen-before对此变量的读操作。
 * happen-before的传递性原则：如果A操作 happen-before B操作，B操作happen-before C操作，那么A操作happen-before B操作。
 
 这里不懂这些“happen-before”原则没关系，后面的文章会慢慢解释这些原则，以及他们在java.util.concurrent包中的类中的使用。先讲明白java并发编程的原理再结合源码分析这些原理的应用，是本系列文章的一大特色。
