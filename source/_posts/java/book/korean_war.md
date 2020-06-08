@@ -7,7 +7,7 @@ tags:
 ---
 
 
-![决战朝鲜](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/book/korean_war.jpg)
+![决战朝鲜](https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/book/korean_war.png)
 
 《决战朝鲜》是我在微信阅读上无意翻到的一本书，记得在小的时候家里就有一本书叫《远东朝鲜战争》（作者 王树增），在精神生活极度匮乏的农村，加之我比较喜欢历史题材类的书籍，小时候没少读这本书，但是到现在已经基本上忘的差不多了，在这个当口发现了李峰的这本《决战朝鲜》索性就利用下班打车时间，午饭后的时间和回到家里赖床的时间读了一下，重温了建国初期中国的这场立国之战。
 
