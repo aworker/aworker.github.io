@@ -145,10 +145,6 @@
     
         
             
-        
-    
-        
-            
             <li><div data-rel="jvm"><i class="fold iconfont icon-right"></i>jvm<small>(2)</small></div>
                 
                     <ul class="sub hide">
@@ -160,6 +156,10 @@
                     </ul>
                 
             </li>
+            
+        
+    
+        
             
         
     
@@ -218,19 +218,19 @@
     <nav id="title-list-nav">
         
         <a  class="book "
-           href="/2020/01/30/java/book/kidnap_game/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="绑架游戏">绑架游戏</span>
-            <span class="post-date" title="2020-01-30 17:36:13">2020/01/30</span>
-        </a>
-        
-        <a  class="book "
            href="/2020/06/06/java/book/korean_war/"
            data-tag=""
            data-author="" >
             <span class="post-title" title="决战朝鲜">决战朝鲜</span>
             <span class="post-date" title="2020-06-06 19:44:13">2020/06/06</span>
+        </a>
+        
+        <a  class="book "
+           href="/2020/01/30/java/book/kidnap_game/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="绑架游戏">绑架游戏</span>
+            <span class="post-date" title="2020-01-30 17:36:13">2020/01/30</span>
         </a>
         
         <a  class="book "
@@ -257,6 +257,14 @@
             <span class="post-date" title="2020-05-07 16:46:13">2020/05/07</span>
         </a>
         
+        <a  class="java并发 java并发原理及实践 "
+           href="/2020/06/07/java/concurrency/post4/post4/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="04 构建线程安全的类：安全发布一个类">04 构建线程安全的类：安全发布一个类</span>
+            <span class="post-date" title="2020-06-07 10:26:30">2020/06/07</span>
+        </a>
+        
         <a  class="spring spring源码剖析系列 "
            href="/2020/05/08/java/spring/post1/post1/"
            data-tag=""
@@ -270,22 +278,6 @@
            data-tag=""
            data-author="" >
             <span class="post-title" title="03 构建线程安全的类：安全发布一个类">03 构建线程安全的类：安全发布一个类</span>
-            <span class="post-date" title="2020-05-20 20:06:13">2020/05/20</span>
-        </a>
-        
-        <a  class="java并发 java并发原理及实践 "
-           href="/2020/06/07/java/concurrency/post4/post4/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="04 构建线程安全的类：安全发布一个类">04 构建线程安全的类：安全发布一个类</span>
-            <span class="post-date" title="2020-06-07 10:26:30">2020/06/07</span>
-        </a>
-        
-        <a  class="java并发 java并发原理及实践 "
-           href="/2020/05/20/java/concurrency/post2/jvm_memory_model/"
-           data-tag=""
-           data-author="" >
-            <span class="post-title" title="02 java内存模型和java语言帮手">02 java内存模型和java语言帮手</span>
             <span class="post-date" title="2020-05-20 20:06:13">2020/05/20</span>
         </a>
         
@@ -303,6 +295,14 @@
            data-author="" >
             <span class="post-title" title="00开篇">00开篇</span>
             <span class="post-date" title="2019-11-09 16:36:13">2019/11/09</span>
+        </a>
+        
+        <a  class="java并发 java并发原理及实践 "
+           href="/2020/05/20/java/concurrency/post2/jvm_memory_model/"
+           data-tag=""
+           data-author="" >
+            <span class="post-title" title="02 java内存模型和java语言帮手">02 java内存模型和java语言帮手</span>
+            <span class="post-date" title="2020-05-20 20:06:13">2020/05/20</span>
         </a>
         
     </nav>
@@ -335,7 +335,7 @@
     </div>
     <div class="article-meta">
         
-        创建时间:<time class="date" title='更新时间: 2020-06-07 09:27:47'>2020-06-06 19:44</time>
+        创建时间:<time class="date" title='更新时间: 2020-06-08 09:40:06'>2020-06-06 19:44</time>
         
     </div>
     <div class="article-meta">
@@ -384,7 +384,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/book/korean_war.jpg" alt="决战朝鲜"></p>
+        <p><img src="https://github.com/aworker/aworker.github.io/raw/hexo/source/_posts/java/book/korean_war.png" alt="决战朝鲜"></p>
 <p>《决战朝鲜》是我在微信阅读上无意翻到的一本书，记得在小的时候家里就有一本书叫《远东朝鲜战争》（作者 王树增），在精神生活极度匮乏的农村，加之我比较喜欢历史题材类的书籍，小时候没少读这本书，但是到现在已经基本上忘的差不多了，在这个当口发现了李峰的这本《决战朝鲜》索性就利用下班打车时间，午饭后的时间和回到家里赖床的时间读了一下，重温了建国初期中国的这场立国之战。</p>
 <p>政治上纵横捭阖的伟人都是审时度势的精算家，变的是他们的态度、观点、甚至是立场，不变的是对永恒的利益的攫取和占有。在新中国呱呱坠地之初，百废待兴之际，在中国的东北发生联合国军与北朝鲜人民军卧榻之战，老一辈革命家不是穷兵黩武，他们热爱和平，但是到了存亡之际他们不怕战争。新中国在刚从内战的疾病中走出来，又要去面对世界上最强的美军，不谈战争的性质和结果，单从这一点开国元勋们就有着异乎寻常的勇气。朝鲜战争最后能够艰难的和平结束，中国的付出是巨大的。其中粮食问题就是一个很好的说明点，“一口炒面一口雪”志愿军就在后勤补给线几乎瘫痪的情况下硬是靠意志力抗住了美军的北进且在五次战役后把战线稳定在38线附近。志愿军也不想靠三八大盖对抗美军的飞机坦克；也不想天天吃炒面导致口鼻生疮严重便秘，也想吃美军的牛肉罐头和水果巧克力；但是没办法啊，当时就是没有那个物质条件，敌人却又逼到了家门口，我们不得不靠惊人的意志力来弥补物质上的差距和美军打了个五五开。现在2020年，中美贸易战在疫情的加持下全面升级，时隔70年又被逼到墙角，而美国举全国之力打压华为就像朝鲜战争中的上甘岭战役，拼的就是一个意志力了，70年前，老一辈革命家有勇气和智慧在战场上获得了尊重也赢得了立国之战，他们的肩膀头子够硬，让我们站的踏实牢靠。今天在中华民族崛起之际这样百年未有之大变局的情况下，我们能不能顶住西方国家的恶意打压最终实现民族的伟大崛起，我们的肩膀头子够不够牢靠？能不能让后人站的住，需要我们共同的努力和奋斗。天佑中华吧！</p>
 <p>最后说下李峰的这本书，全书行文过多给历史人物加内心独白，有一种演义的倾向了，大体上的历史脉络没有问题，但是具体的历史细节可就不敢恭维了。</p>
@@ -405,7 +405,7 @@
     
     <p><span class="copy-title">本文作者:</span><a href="javascript:void(0)" target="_blank" rel="noopener" title="aworker">aworker</a></p>
     <p><span class="copy-title">发布时间:</span>2020-06-06, 19:44:13</p>
-    <p><span class="copy-title">最后更新:</span>2020-06-07, 09:27:47</p>
+    <p><span class="copy-title">最后更新:</span>2020-06-08, 09:40:06</p>
     <span class="copy-title">原始链接:</span><a class="post-url" href="/2020/06/06/java/book/korean_war/" title="决战朝鲜">http://aworker.cn/2020/06/06/java/book/korean_war/</a>
     <p>
         <span class="copy-title">版权声明:</span><i class="fa fa-creative-commons"></i> <a rel="license noopener" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" title="CC BY-NC-SA 4.0 International" target = "_blank">"署名-非商用-相同方式共享 4.0"</a> 转载请保留原文链接及作者。
